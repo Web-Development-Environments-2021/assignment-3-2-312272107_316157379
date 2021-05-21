@@ -3,28 +3,40 @@ var router = express.Router();
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcryptjs");
 
-router.post("/Register", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
   try {
-    // parameters exists
-    // valid parameters
+    const {username,password,firstname,lastname,email,profile_pic} = req.body
+
+    // parameters exists - username and password required
+    if (!username || !password)
+      throw { status: 400, message: "username or password weren't sent" };
+
+
     // username exists
     const users = await DButils.execQuery(
-      "SELECT username FROM dbo.users_tirgul"
+      "SELECT * FROM dbo.users"
+      // `SELECT user_name FROM dbo.users WHERE user_name==${req.body.username}`
     );
 
-    if (users.find((x) => x.username === req.body.username))
+    if (users.find((x) => x.username === username))
       throw { status: 409, message: "Username taken" };
+
+    
+
+    // valid parameters - clientside in our case, so nothing done here
+
 
     //hash the password
     let hash_password = bcrypt.hashSync(
-      req.body.password,
+      password,
       parseInt(process.env.bcrypt_saltRounds)
     );
-    req.body.password = hash_password;
+    password = hash_password;
 
     // add the new username
     await DButils.execQuery(
-      `INSERT INTO dbo.users_tirgul (username, password) VALUES ('${req.body.username}', '${hash_password}')`
+      `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic) 
+      VALUES ('${username}', '${password}','${firstname}','${lastname}','${email}','${profile_pic}')`
     );
     res.status(201).send("user created");
   } catch (error) {
@@ -32,7 +44,7 @@ router.post("/Register", async (req, res, next) => {
   }
 });
 
-router.post("/Login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   try {
     const user = (
       await DButils.execQuery(

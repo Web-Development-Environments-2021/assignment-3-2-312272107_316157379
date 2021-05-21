@@ -3,7 +3,7 @@ const DButils = require("./routes/utils/DButils");
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
-//#endregion
+//#endregionn
 //#region express configures
 var express = require("express");
 var path = require("path");
@@ -17,7 +17,7 @@ app.use(express.json()); // parse application/json
 app.use(
   session({
     cookieName: "session", // the cookie key name
-    secret: process.env.COOKIE_SECRET, // the encryption key
+    secret: process.env.COOKIE_SECRET, // the encryption key && replace with env
     duration: 24 * 60 * 60 * 1000, // expired after 20 sec
     activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration,
     cookie: {
@@ -45,7 +45,7 @@ const corsConfig = {
 app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
 
-const port = process.env.PORT || "3000";
+const port = process.env.PORT || "3000"; // replace with env
 
 const auth = require("./routes/auth");
 const users = require("./routes/users");
