@@ -2,10 +2,11 @@ var express = require("express");
 var router = express.Router();
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcryptjs");
+const { role_to_role_name } = require("./utils/users_utils");
 
 router.post("/register", async (req, res, next) => {
   try {
-    const {username,password,firstname,lastname,email,profile_pic} = req.body
+    let {username,password,firstname,lastname,email,profile_pic} = req.body;
 
     // parameters exists - username and password required
     if (!username || !password)
@@ -15,11 +16,16 @@ router.post("/register", async (req, res, next) => {
     // username exists
     const users = await DButils.execQuery(
       "SELECT * FROM dbo.users"
-      // `SELECT user_name FROM dbo.users WHERE user_name==${req.body.username}`
-    );
+      );
+      if (users.find((x) => x.username === username))
+        throw { status: 409, message: "user could not be added, name taken." };
 
-    if (users.find((x) => x.username === username))
-      throw { status: 409, message: "Username taken" };
+    // const user_name_exists = await DButils.execQuery(
+    //   `SELECT user_name FROM dbo.users WHERE user_name==${req.body.username}`
+    // );
+    //   if (user_name_exists === 'undefined') //need to verify what is returned when select doesnt find anything
+    //     throw { status: 409, message: "user could not be added, name taken." };
+
 
     
 
@@ -28,17 +34,30 @@ router.post("/register", async (req, res, next) => {
 
     //hash the password
     let hash_password = bcrypt.hashSync(
-      password,
+      req.body.password,
       parseInt(process.env.bcrypt_saltRounds)
     );
-    password = hash_password;
+    req.body.password = hash_password;
 
     // add the new username
     await DButils.execQuery(
       `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic) 
-      VALUES ('${username}', '${password}','${firstname}','${lastname}','${email}','${profile_pic}')`
+      VALUES ('${username}', '${hash_password}','${firstname}','${lastname}','${email}','${profile_pic}')`
+      
     );
-    res.status(201).send("user created");
+    // add permissions of subscriber to new user.
+
+    // await DButils.execQuery(
+    //   `INSERT INTO user_roles (username,role) VALUES ('${username}', '${role_to_role_name.SUBSCRIBER}')`
+    // );
+
+    await DButils.execQuery(
+      `INSERT INTO user_roles (user_id,role) VALUES
+      (SELECT user_id FROM dbo.users WHERE user_name==${username}, '${role_to_role_name.SUBSCRIBER}')`
+    );
+
+
+    res.status(201).send("user successfully added");
   } catch (error) {
     next(error);
   }
@@ -48,7 +67,7 @@ router.post("/login", async (req, res, next) => {
   try {
     const user = (
       await DButils.execQuery(
-        `SELECT * FROM dbo.users_tirgul WHERE username = '${req.body.username}'`
+        `SELECT * FROM dbo.users WHERE username = '${req.body.username}'`
       )
     )[0];
     // user = user[0];
@@ -69,7 +88,7 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.post("/Logout", function (req, res) {
+router.post("/logout", function (req, res) {
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
   res.send({ success: true, message: "logout succeeded" });
 });

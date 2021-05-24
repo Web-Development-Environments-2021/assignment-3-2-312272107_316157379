@@ -12,6 +12,16 @@ async function getFavoritePlayers(user_id) {
   );
   return player_ids;
 }
+ 
+const role_to_role_name = {
+    SUBSCRIBER: 'subscriber',
+    REFEREE: 'referee',
+    PLAYER:  'player',
+    UNION_REP: 'union_representative',
+} ;
+
 
 exports.markPlayerAsFavorite = markPlayerAsFavorite;
 exports.getFavoritePlayers = getFavoritePlayers;
+exports.role_to_role_name = role_to_role_name;
+
