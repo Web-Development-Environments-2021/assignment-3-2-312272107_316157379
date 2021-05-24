@@ -20,11 +20,8 @@
 
 -- Deletion
 
-select * from dbo.users
-select * from dbo.user_roles
+DELETE FROM dbo.user_roles
+DELETE FROM dbo.users
 
--- DELETE FROM dbo.user_roles
--- DELETE FROM dbo.users
-
-
-
+-- select * from dbo.users
+-- select * from dbo.user_roles
