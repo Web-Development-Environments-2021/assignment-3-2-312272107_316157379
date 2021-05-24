@@ -3,10 +3,11 @@ var router = express.Router();
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcryptjs");
 const { role_to_role_name } = require("./utils/users_utils");
+var fs = require('fs');
 
 router.post("/register", async (req, res, next) => {
   try {
-    let {username,password,firstname,lastname,email,profile_pic} = req.body;
+    let {username,password,first_name,last_name,email,profile_pic} = req.body;
 
     // parameters exists - username and password required
     if (!username || !password)
@@ -42,7 +43,7 @@ router.post("/register", async (req, res, next) => {
     // add the new username
     await DButils.execQuery(
       `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic) 
-      VALUES ('${username}', '${hash_password}','${firstname}','${lastname}','${email}','${profile_pic}')`
+      VALUES ('${username}', '${hash_password}','${first_name}','${last_name}','${email}','${profile_pic}')`
       
     );
     // add permissions of subscriber to new user.
@@ -52,16 +53,20 @@ router.post("/register", async (req, res, next) => {
     // );
 
     await DButils.execQuery(
-      `INSERT INTO user_roles (user_id,role) VALUES
-      (SELECT user_id FROM dbo.users WHERE user_name==${username}, '${role_to_role_name.SUBSCRIBER}')`
+      `INSERT INTO dbo.user_roles (user_id,role) VALUES
+      ((SELECT user_id FROM dbo.users WHERE username='${username}'), '${role_to_role_name.SUBSCRIBER}')`
     );
 
 
-    res.status(201).send("user successfully added");
+    res.status(201).send(user_creation_message);
+    fs.appendFile('log.txt',`user ${username} successfully registered`);
   } catch (error) {
+    fs.appendFile('log.txt',error,function (err) {
+      console.log('error when trying to write to log file');
+      next(error);
+    });
     next(error);
-  }
-});
+};
 
 router.post("/login", async (req, res, next) => {
   try {
