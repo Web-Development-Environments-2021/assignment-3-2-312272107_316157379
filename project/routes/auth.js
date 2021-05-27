@@ -86,11 +86,13 @@ router.post("/login", async (req, res, next) => {
 
     // Set cookie
     req.session.user_id = user.user_id;
-
+    user_id_as_int = parseInt(user.user_id);
     // return cookie
     user_login_message = `user '${req.body.username}' successful logged in`;
-    const user_roles = DButils.execQuery(
-      `SELECT role from dbo.user_roles WHERE user_id = '${user.user_id}'`
+    let user_roles = await (
+      DButils.execQuery(
+      `SELECT role FROM dbo.user_roles WHERE user_id = ${user_id_as_int}`
+      )
     );
     res.status(200).send(
       {
@@ -108,6 +110,7 @@ router.post("/login", async (req, res, next) => {
 router.post("/logout", function (req, res) {
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
   res.send({ success: true, message: "logout succeeded" });
+  logStream.end("logout succeeded");
 });
 
 module.exports = router;

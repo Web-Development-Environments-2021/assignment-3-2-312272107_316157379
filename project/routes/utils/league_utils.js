@@ -1,5 +1,5 @@
 const axios = require("axios");
-const LEAGUE_ID = 271;
+const LEAGUE_ID = 271; // SuperLiga
 
 async function getLeagueDetails() {
   const league = await axios.get(
@@ -19,6 +19,8 @@ async function getLeagueDetails() {
       },
     }
   );
+
+
   return {
     league_name: league.data.data.name,
     current_season_name: league.data.data.season.data.name,
