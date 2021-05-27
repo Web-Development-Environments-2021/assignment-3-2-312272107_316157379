@@ -50,6 +50,9 @@ const port = process.env.PORT || "3000"; // replace with env
 
 const auth = require("./routes/auth");
 const users = require("./routes/users");
+
+const union_rep = require("./routes/roles/union_rep");
+
 const league = require("./routes/league");
 const teams = require("./routes/teams");
 
@@ -73,10 +76,13 @@ app.use(function (req, res, next) {
 //#endregion
 
 // ----> For cheking that our server is alive
-app.get("/alive", (req, res) => res.send("I'm alive"));
+// app.get("/alive", (req, res) => res.send("I'm alive"));
 
 // Routings
 app.use("/users", users);
+
+app.use("/users/union_rep", union_rep);
+
 app.use("/league", league);
 app.use("/teams", teams);
 app.use(auth);
@@ -87,7 +93,7 @@ app.use(function (err, req, res, next) {
 });
 
 const server = app.listen(port, () => {
-  console.log(`Server listen on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
 
 // process.on("SIGINT", function () {

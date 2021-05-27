@@ -1,3 +1,6 @@
+--***************************************************
+
+--Tables
 -- CREATE TABLE [dbo].[users](
 -- 	[user_id] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,    
 --     [user_name] [varchar](50) NOT NULL UNIQUE,
@@ -27,23 +30,33 @@
 
 -- CREATE TABLE matches_event_log(
 -- 	match_id [int],
---     match_date [date],
---     event_time [time], -- 23:30 
+--     match_date [date], --1992-11-23
+--     event_time [time], -- 23:30:13
 --     minute_in_match [int], -- 13
 --     description [varchar](200),
 -- 	FOREIGN KEY (match_id) REFERENCES dbo.matches(match_id),
 --     PRIMARY KEY(match_id,match_date,event_time),
 -- );
 
+--***************************************************
+
+-- Selection
 -- select * from dbo.matches
-
--- Deletion
-
 -- select * from dbo.users
 -- select * from dbo.user_roles
 
+-- SELECT TOP 1 *
+-- FROM dbo.matches
+-- WHERE dbo.matches.match_date > (SELECT CAST( GETDATE() AS Date ))
+-- ORDER BY dbo.matches.match_date ASC
+
+
+--***************************************************
+
+-- Deletion
 -- DELETE FROM dbo.user_roles
 -- DELETE FROM dbo.users
+-- DELETE FROM dbo.matches
 
-
+--***************************************************
 

@@ -14,7 +14,7 @@ paths:
   /register:  
     post:
       tags: 
-        - users
+        - authentication
       summary: register 
       description: register new user to system
       requestBody:
@@ -25,13 +25,15 @@ paths:
               $ref: '#/components/schemas/new_user'
       responses:
         '201':
-          description: "user successfully added"
+          description: "user {user_name} successfully added"
+        '409':  
+          description: "user could not be added, name taken."
         '400':
-          description: "user could not be added"
+          description: "username or password weren't sent."
   /login:  
     post:
       tags: 
-        - users
+        - authentication
       summary: user log in
       requestBody:
         required: true
@@ -41,32 +43,19 @@ paths:
               $ref: '#/components/schemas/Login'
       responses:
         "200":
-          description: "user successful login"
-        "400":
+          description: "user {user_name} successfully logged in"
+        "401":
           description: "Invalid username/password"
-  /users/{user_id}/favorites/{object_type}:
+  /logout:  
     get:
       tags: 
-        - users
-        - favorites
-      summary: get_favorites 
-      description: fetch all matchs / teams / players for user
-      parameters: 
-      - in: "path"
-        name: user_id
-        required: true
-        schema:
-          type: integer
-      - in: "path"
-        name: object_type
-        required: true
-        schema:
-          type: string #verified at client-side
+        - authentication
+      summary: user logout
       responses:
         "200":
-          description: "returned favorites"
+          description: "user successfully logged out"
         "400":
-          description: "Invalid user ID  or object type supplied"
+          description: "failed to log out"
   /league/details:
     get:
       tags: 
@@ -76,6 +65,17 @@ paths:
       responses:
         "200":
           description: "returned league details"
+        "404":
+          description: "couldn't supply league's details, league not found"
+  /league/matches:
+    get:
+      tags: 
+        - league
+      summary: get_matches_in_league
+      description: get all matches in SuperLiga. 
+      responses:
+        "200":
+          description: "returned matches that match team id"
         "404":
           description: "couldn't supply league's details, league not found"
   /matches/{match_id}:
@@ -94,22 +94,41 @@ paths:
           description: "returned match that matches id"
         "404":
           description: "invalid match id"
-  /coaches/{coach_id}:
-    get:
+  /users/union_rep/matches:
+    post:
       tags: 
-        - coaches
-      summary: get_coach_by_id 
-      parameters: 
-      - in: "path"
-        name: coach_id
+        - matches
+        - union_rep
+      summary: set_new_match 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/new_match'
+      responses:
+        '201':
+          description: "match successfully added"
+        '400':
+          description: "match could not be added"
+  /users/ref/matches/{match_id}/eventLog:
+    put:
+      tags: 
+        - matches
+        - referee
+      summary: add_event_to_match 
+      description: add new event to event log of match_id
+      parameters:
+      - name: "match_id"
+        in: "path" 
         required: true
         schema:
-          type: integer
+           $ref: '#/components/schemas/new_game_event'
       responses:
-        "200":
-          description: "returned coach that matches coach id"
-        "404":
-          description: "invalid coach id"
+        '201':
+          description: "event successfully added to event log"
+        '404':
+          description: "user or match could not be found"
   /players/{player_id}:
     get:
       tags: 
@@ -161,7 +180,6 @@ paths:
   /players/search/{player_name}:
     get:
       tags: 
-        - players
         - search
       summary: get_player_by_name
       description: get player by full or partial name query. 
@@ -176,24 +194,6 @@ paths:
           description: "returned players that match name query"
         "404":
           description: "invalid name query, could not find players"
-  /coaches/search/{coach_name}:
-    get:
-      tags: 
-        - coaches
-        - search
-      summary: get_coach_by_name
-      description: get coach by full or partial name query. 
-      parameters: 
-      - in: "path"
-        name: coach_name
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: "returned coaches that match name query"
-        "404":
-          description: "invalid name query, could not find coachs"
   /teams/search/{team_name}:
     get:
       tags: 
@@ -216,7 +216,6 @@ paths:
     get:
       tags: 
         - teams
-        - matches
       summary: get_matches_by_team
       description: get all matches team has played in or will play in. 
       parameters: 
@@ -231,11 +230,28 @@ paths:
         "404":
           description: "invalid team id, could not find matches"
   /users/{user_id}/favorites/matches:
+    get:
+      tags: 
+        - favorites
+      summary: get_favorites 
+      description: fetch all favorite matches of user_id
+      parameters: 
+      - in: "path"
+        name: user_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: "returned favorites"
+        "400":
+          description: "Invalid user ID"
+  /users/{user_id}/favorites/matches/{match_id}:
     put:
       tags: 
         - users
         - favorites
-      summary: register 
+      summary: add match to user favorites 
       description: register new user to system
       parameters:
       - name: "user_id"
@@ -245,7 +261,7 @@ paths:
           type: "integer"
         # format: "int64"
       - name: "match_id"
-        in: "query" #?
+        in: "path" 
         description: "match to add to favorites matches of user"
         required: true
         schema:
@@ -256,59 +272,6 @@ paths:
           description: "match successfully added to favorites"
         '404':
           description: "user or match could not be found"
-  /users/{user_id}/favorites/players:
-    put:
-      tags: 
-        - users
-        - favorites
-      summary: register 
-      description: register new user to system
-      parameters:
-      - name: "user_id"
-        in: "path" #?
-        required: true
-        schema:
-          type: "integer"
-        # format: "int64"
-      - name: "player_id"
-        in: "query" #?
-        description: "player to add to favorites players of user"
-        required: true
-        schema:
-          type: "integer"
-        # format: "int64"
-      responses:
-        '201':
-          description: "player successfully added to favorites"
-        '404':
-          description: "user or player could not be found"
-  /users/{user_id}/favorites/teams:
-    put:
-      tags: 
-        - users
-        - favorites
-      summary: register 
-      description: register new user to system
-      parameters:
-      - name: "user_id"
-        in: "path" #?
-        required: true
-        schema:
-          type: "integer"
-        # format: "int64"
-      - name: "team_id"
-        in: "query" #?
-        description: "team to add to favorites teams of user"
-        required: true
-        schema:
-          type: "integer"
-        # format: "int64"
-      responses:
-        '201':
-          description: "team successfully added to favorites"
-        '404':
-          description: "user or team could not be found"
-          
           
           
 components:
@@ -352,15 +315,54 @@ components:
       description: user info for login
       properties:
         username:
-           pattern: '/^[a-zA-Z]+$/' #letters only?
-           minLength: 3
-           maxLength: 8
-           description: username must be between 3 to 8 chars and only letters
+           type: string
            example: 'tom'
         password:
+           type: string
+           example: 'rob1'
+    new_match:
+      type: object
+      properties:
+        date:
           type: string
-          pattern: '/[a-zA-Z]\d/g' #has number and letter
+          format: date
+          example: '20-2-2012' #might be a problem because not the same as their format
+        hour:
+          type: string
+          description: hour-minutes in 4 digits format 
           minLength: 5
-          maxLength: 10
-          description: password between 5 to 10 chars, must consist of 1 digit and 1 special char
-          example: 'rob1'
+          maxLength: 5
+          example: '03:59:12'
+        home_team_name:
+          type: string
+          # required: true
+          example: 'OB'
+        away_team_name:
+          type: string
+          # required: true
+          example: 'AGF'
+        # court
+    new_game_event:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: 'yyyy-mm-dd'
+          example: '2012-12-22'
+        time:
+          type: string
+          description: 'hh:mm:ss'
+          minLength: 5
+          maxLength: 5
+          example: '03:59'
+        minute_in_game: #can also be a string with a name
+          type: integer
+          description: exact time during match in which the event occurred
+          minimum: 0
+          # maximum: 90 not capped because overtime
+          example: 35
+        event_description:
+          type: string
+          # perhaps should be done with ids because only certain events are permitted
+          # example: 'red card to Avichai for biting the referee'
