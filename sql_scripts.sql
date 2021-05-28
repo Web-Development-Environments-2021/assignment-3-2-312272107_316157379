@@ -28,14 +28,15 @@
 -- 	[score] [varchar](50) NULL, 
 -- )
 
--- CREATE TABLE matches_event_log(
--- 	match_id [int],
---     match_date [date], --1992-11-23
+-- CREATE TABLE dbo.matches_event_log(
+-- 	   match_id [int],
+--     event_date [date], --1992-11-23
 --     event_time [time], -- 23:30:13
---     minute_in_match [int], -- 13
+--     minute_in_game [int], -- 13
+--     event_type [varchar](20), 
 --     description [varchar](200),
 -- 	FOREIGN KEY (match_id) REFERENCES dbo.matches(match_id),
---     PRIMARY KEY(match_id,match_date,event_time),
+--     PRIMARY KEY(match_id,event_date,event_time),
 -- );
 
 --***************************************************
@@ -44,6 +45,7 @@
 -- select * from dbo.matches
 -- select * from dbo.users
 -- select * from dbo.user_roles
+-- select * from dbo.matches_event_log
 
 -- SELECT TOP 1 *
 -- FROM dbo.matches
@@ -57,6 +59,12 @@
 -- DELETE FROM dbo.user_roles
 -- DELETE FROM dbo.users
 -- DELETE FROM dbo.matches
+-- DELETE FROM dbo.matches_event_log
+
+
+-- Drop Table dbo.matches_event_log 
 
 --***************************************************
+
+
 

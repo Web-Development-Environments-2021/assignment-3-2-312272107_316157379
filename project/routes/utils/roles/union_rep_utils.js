@@ -26,4 +26,17 @@ async function get_team_in_league(team_name,league_id=LEAGUE_ID) {
     }
 }
 
+const event_types = {
+  goal: 'Goal',
+  offside: 'Offside',
+  foul:  'Foul',
+  redcard: 'Red-Card',
+  yellowcard: 'Yellow-Card',
+  injury: 'Injury',
+  sub: 'Substitution',
+  other: 'Other',
+} ;
+
+
 exports.get_team_in_league = get_team_in_league;
+exports.event_types = event_types;

@@ -111,11 +111,11 @@ paths:
           description: "match successfully added"
         '400':
           description: "match could not be added"
-  /users/ref/matches/{match_id}/eventLog:
-    put:
+  /users/union_rep/matches/{match_id}/event_log:
+    post:
       tags: 
         - matches
-        - referee
+        - union_rep
       summary: add_event_to_match 
       description: add new event to event log of match_id
       parameters:
@@ -126,9 +126,9 @@ paths:
            $ref: '#/components/schemas/new_game_event'
       responses:
         '201':
-          description: "event successfully added to event log"
+          description: "event added successfully"
         '404':
-          description: "user or match could not be found"
+          description: "match could not be found"
   /players/{player_id}:
     get:
       tags: 
@@ -326,7 +326,8 @@ components:
         date:
           type: string
           format: date
-          example: '20-2-2012' #might be a problem because not the same as their format
+          description: 'yyyy-mm-dd'
+          example: '2012-12-22'
         hour:
           type: string
           description: hour-minutes in 4 digits format 
@@ -345,24 +346,15 @@ components:
     new_game_event:
       type: object
       properties:
-        date:
-          type: string
-          format: date
-          description: 'yyyy-mm-dd'
-          example: '2012-12-22'
-        time:
-          type: string
-          description: 'hh:mm:ss'
-          minLength: 5
-          maxLength: 5
-          example: '03:59'
         minute_in_game: #can also be a string with a name
           type: integer
           description: exact time during match in which the event occurred
           minimum: 0
-          # maximum: 90 not capped because overtime
           example: 35
+        event_type:
+          type: string
+          description: possible events - Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution. any other event will be labeled as "Other".
+          example: 'Other'
         event_description:
           type: string
-          # perhaps should be done with ids because only certain events are permitted
-          # example: 'red card to Avichai for biting the referee'
+          example:  red card was given to messi for not being organized

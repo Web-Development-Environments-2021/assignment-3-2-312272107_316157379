@@ -12,7 +12,6 @@ const LEAGUE_ID = 271; // SuperLiga
 
 router.post("/matches", async (req, res, next) => {
 try {
-    // TODO verify user has role of union rep, extract info from cookie first
 
     const {date,hour,home_team_name,away_team_name} = req.body; 
 
@@ -33,9 +32,11 @@ try {
         DECLARE @date date = '${date}';
         DECLARE @time time = '${hour}';
         INSERT INTO dbo.matches(match_date, hour,home_team,away_team,venue)
+        OUTPUT Inserted.match_id
         VALUES (@date,@time ,'${home_team_name}','${away_team_name}','${venue.data.data.name}');
         `
       );
+    
     
     const match_creation_message = 'match created succesfully';
     res.status(201).send(match_creation_message);
@@ -45,5 +46,36 @@ try {
     next(error);
   }
 });
+
+router.post("/matches/:match_id/event_log", async (req, res, next) => {
+  try {
+      
+      let {minute_in_game,event_type,event_description} = req.body; 
+      if (Object.values(union_rep_utils.event_types).find( (value) => value === event_type) === 'undefined'){
+        event_type = union_rep_utils.event_types.other;
+      }
+    
+      await DButils.execQuery(
+          `
+          DECLARE @date date = (SELECT CAST( GETDATE() AS Date ));
+          DECLARE @time time = (SELECT CAST( GETDATE() AS Time ));
+          INSERT INTO dbo.matches_event_log(match_id,event_date,event_time,minute_in_game,event_type,description)
+          VALUES (${req.params.match_id}, @date, @time ,${minute_in_game},'${event_type}','${event_description}');
+          `
+        );
+        
+      
+      const match_creation_message = 'event added successfully';
+      res.status(201).send(match_creation_message);
+      logStream.end(match_creation_message);
+    } catch (error) {
+      // logStream.end(error.message); 
+      next(error);
+    }
+  });
+
+
+
+
 
 module.exports = router;
