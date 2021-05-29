@@ -3,7 +3,7 @@
 --Tables
 -- CREATE TABLE [dbo].[users](
 -- 	[user_id] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,    
---     [user_name] [varchar](50) NOT NULL UNIQUE,
+--     [username] [varchar](50) NOT NULL UNIQUE,
 -- 	[password] [varchar](50) NOT NULL,
 -- 	[first_name] [varchar](50) NULL,
 -- 	[last_name] [varchar](50) NULL,
@@ -39,6 +39,28 @@
 --     PRIMARY KEY(match_id,event_date,event_time),
 -- );
 
+
+-- CREATE TABLE dbo.favorite_matches(
+--     user_id [int],
+--     match_id [int],
+-- 	FOREIGN KEY (user_id) REFERENCES dbo.users(user_id),
+--     FOREIGN KEY (match_id) REFERENCES dbo.matches(match_id),
+--     PRIMARY KEY(user_id,match_id),
+-- );
+-- CREATE TABLE dbo.favorite_teams(
+--     user_id [int],
+--     team_id [int],
+-- 	FOREIGN KEY (user_id) REFERENCES dbo.users(user_id),
+--     PRIMARY KEY(user_id,team_id),
+-- );
+-- CREATE TABLE dbo.favorite_players(
+--     user_id [int],
+--     player_id [int],
+-- 	FOREIGN KEY (user_id) REFERENCES dbo.users(user_id),
+--     PRIMARY KEY(user_id,player_id),
+-- );
+
+
 --***************************************************
 
 -- Selection
@@ -46,6 +68,8 @@
 -- select * from dbo.users
 -- select * from dbo.user_roles
 -- select * from dbo.matches_event_log
+
+-- SELECt * FROM dbo.matches WHERE match_id IN ('[8,9].join(',')');
 
 -- SELECT TOP 1 *
 -- FROM dbo.matches
@@ -60,6 +84,7 @@
 -- DELETE FROM dbo.users
 -- DELETE FROM dbo.matches
 -- DELETE FROM dbo.matches_event_log
+-- DELETE FROM dbo.favorite_matches
 
 
 -- Drop Table dbo.matches_event_log 
@@ -67,4 +92,5 @@
 --***************************************************
 
 
-
+-- INSERT INTO dbo.favorite_matches
+-- VALUES (10,8)

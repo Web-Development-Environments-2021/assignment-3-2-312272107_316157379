@@ -16,22 +16,11 @@ router.post("/register", async (req, res, next) => {
 
 
     // username exists
-    const users = await DButils.execQuery(
-      "SELECT * FROM dbo.users"
-      );
-      if (users.find((x) => x.username === username))
+    const user_name_exists = await DButils.execQuery(
+      `SELECT * FROM dbo.users WHERE username='${req.body.username}'`
+    );
+      if (user_name_exists === 'undefined') //need to verify what is returned when select doesnt find anything
         throw { status: 409, message: "user could not be added, name taken." };
-
-    // const user_name_exists = await DButils.execQuery(
-    //   `SELECT user_name FROM dbo.users WHERE user_name==${req.body.username}`
-    // );
-    //   if (user_name_exists === 'undefined') //need to verify what is returned when select doesnt find anything
-    //     throw { status: 409, message: "user could not be added, name taken." };
-
-
-    
-
-    // valid parameters - clientside in our case, so nothing done here
 
 
     //hash the password
@@ -48,10 +37,6 @@ router.post("/register", async (req, res, next) => {
       
     );
     // add permissions of subscriber to new user.
-
-    // await DButils.execQuery(
-    //   `INSERT INTO user_roles (username,role) VALUES ('${username}', '${role_to_role_name.SUBSCRIBER}')`
-    // );
 
     await DButils.execQuery(
       `INSERT INTO dbo.user_roles (user_id,role) VALUES
@@ -86,12 +71,11 @@ router.post("/login", async (req, res, next) => {
 
     // Set cookie
     req.session.user_id = user.user_id;
-    user_id_as_int = parseInt(user.user_id);
     // return cookie
     user_login_message = `user '${req.body.username}' successful logged in`;
     let user_roles = await (
       DButils.execQuery(
-      `SELECT role FROM dbo.user_roles WHERE user_id = ${user_id_as_int}`
+      `SELECT role FROM dbo.user_roles WHERE user_id = ${user.user_id}`
       )
     );
     res.status(200).send(
