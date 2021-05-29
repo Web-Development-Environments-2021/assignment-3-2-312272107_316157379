@@ -29,14 +29,18 @@ router.post("/favorites/:category_name", async (req, res, next) => {
   try {
     const category_name = req.params.category_name;
     await users_utils.verify_category(category_name);
-    const user_id = req.session.user_id;
-    // const user_id = req.body.user_id;
+
+    //testing purposes only
+    // const user_id = req.session.user_id;
+    const user_id = req.body.user_id;
+
     const favorite_id = req.body.favorite_id;
     await DButils.execQuery(`INSERT INTO dbo.favorite_${category_name}es VALUES (${user_id},${favorite_id})`);
     const success_message = `The ${category_name} was successfully saved as a favorite`; 
     res.status(201).send(success_message);
     logStream.end(success_message);
   } catch (error) {
+    logStream.end(error.message);
     next(error);
   }
 });
@@ -63,14 +67,12 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     const favorites = await favorites_handler_function(favorites_ids);
 
     res.status(200).send(favorites);
+    logStream.end('successfully returned favorites');
   } catch (error) {
+    logStream.end(error.message);
     next(error);
   }
 });
-
-
-
-
 
 
 module.exports = router;

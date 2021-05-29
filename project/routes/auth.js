@@ -3,29 +3,24 @@ var router = express.Router();
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcryptjs");
 const { role_to_role_name } = require("./utils/users_utils");
-let fs = require('fs');
-let logStream = fs.createWriteStream('log.txt', {flags: 'a'});
+const fs = require('fs');
+const logStream = fs.createWriteStream('log.txt', {flags: 'a'});
 
 router.post("/register", async (req, res, next) => {
   try {
-    let {username,password,first_name,last_name,email,profile_pic} = req.body;
-
-    // parameters exists - username and password required - clientside
-    // if (!username || !password)
-    //   throw { status: 400, message: "username or password weren't sent" };
-
+    const {username,password,first_name,last_name,email,profile_pic} = req.body;
 
     // username exists
-    const user_name_exists = await DButils.execQuery(
-      `SELECT * FROM dbo.users WHERE username='${req.body.username}'`
-    );
-      if (user_name_exists === 'undefined') //need to verify what is returned when select doesnt find anything
-        throw { status: 409, message: "user could not be added, name taken." };
+    await DButils.execQuery(`SELECT * FROM dbo.users WHERE username='${username}'`).then((q_user_name) => {
+      if (q_user_name.length > 0) {
+        throw { status: 409, message: "user could not be added, name taken.\n" };
+      }
+    });
 
 
     //hash the password
     let hash_password = bcrypt.hashSync(
-      req.body.password,
+      password,
       parseInt(process.env.bcrypt_saltRounds)
     );
     req.body.password = hash_password;
@@ -43,11 +38,11 @@ router.post("/register", async (req, res, next) => {
       ((SELECT user_id FROM dbo.users WHERE username='${username}'), '${role_to_role_name.SUBSCRIBER}')`
     );
 
-    const user_creation_message = `user '${username}' succesfully added`;
+    const user_creation_message = `user '${username}' succesfully added\n`;
     res.status(201).send(user_creation_message);
     logStream.end(user_creation_message);
   } catch (error) {
-    // logStream.end(error.message); TODO need to return to this later
+    logStream.end(error.message); 
     next(error);
   }
 });
@@ -57,12 +52,7 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    const user = (
-      await DButils.execQuery(
-        `SELECT * FROM dbo.users WHERE username = '${req.body.username}'`
-      )
-    )[0];   // user = user[0];
-    // console.log(user);
+    const user = await DButils.execQuery(`SELECT * FROM dbo.users WHERE username = '${req.body.username}'`)[0];   // user = user[0];
 
     // check that username exists & the password is correct
     if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
@@ -71,13 +61,9 @@ router.post("/login", async (req, res, next) => {
 
     // Set cookie
     req.session.user_id = user.user_id;
-    // return cookie
-    user_login_message = `user '${req.body.username}' successful logged in`;
-    let user_roles = await (
-      DButils.execQuery(
-      `SELECT role FROM dbo.user_roles WHERE user_id = ${user.user_id}`
-      )
-    );
+    let user_roles = await DButils.execQuery(`SELECT role FROM dbo.user_roles WHERE user_id = ${user.user_id}`);
+
+    user_login_message = `user '${req.body.username}' successful logged in\n`;
     res.status(200).send(
       {
         message: user_login_message,
@@ -86,7 +72,7 @@ router.post("/login", async (req, res, next) => {
 
     logStream.end(user_login_message);
   } catch (error) {
-    // logStream.end(user_creation_message); return to this later
+    logStream.end(error.message); 
     next(error);
   }
 });
