@@ -1,4 +1,8 @@
 const DButils = require("./DButils");
+// const { getPlayersInfo } = require("./players_utils");
+const players_utils = require("./players_utils");
+const match_utils = require("./match_utils");
+
 const role_to_role_name = {
     SUBSCRIBER: 'subscriber',
     REFEREE: 'referee',
@@ -32,6 +36,19 @@ async function verify_category(category_name){
     throw { status: 400, message: "invalid category name" };
   }
 }
+
+
+ function get_favorites_handler(category_name){
+  if (category_name == favorite_categories.PLAYER){
+    return players_utils.getPlayersInfo;
+ }
+ else if(category_name == favorite_categories.MATCH){
+    return match_utils.get_matches_info;
+ }
+ else{ // teams
+      return players_utils.getPlayersByTeam;
+ }
+}
  
 
 
@@ -40,5 +57,6 @@ exports.getFavoritePlayers = getFavoritePlayers;
 exports.role_to_role_name = role_to_role_name;
 exports.favorite_categories = favorite_categories;
 exports.verify_category = verify_category;
+exports.get_favorites_handler = get_favorites_handler;
 
 
