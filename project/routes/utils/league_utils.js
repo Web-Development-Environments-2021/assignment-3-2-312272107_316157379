@@ -1,5 +1,5 @@
 const axios = require("axios");
-const DButils = require("../utils/DButils");
+const DButils = require("./DButils");
 const LEAGUE_ID = 271; // SuperLiga
 // const season_id = 17328; // SuperLiga
 

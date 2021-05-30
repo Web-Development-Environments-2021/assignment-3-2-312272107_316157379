@@ -1,7 +1,5 @@
 const DButils = require("./DButils");
-// const { getPlayersInfo } = require("./players_utils");
-const players_utils = require("./players_utils");
-const match_utils = require("./match_utils");
+const {plural} = require('pluralize'); // requires testing
 
 const role_to_role_name = {
     SUBSCRIBER: 'subscriber',
@@ -15,22 +13,21 @@ const favorite_categories = {
   TEAM:  'team'
 } ;
 
-async function markPlayerAsFavorite(user_id, player_id) {
-  await DButils.execQuery(
-    `insert into FavoritePlayers values ('${user_id}',${player_id})`
+// get favorites ids based on category name - query to db and then process input
+async function get_favorites_ids(category_name,user_id){
+  const favorites_ids = await DButils.execQuery(
+    `SELECT ${category_name}_id FROM dbo.favorite_${category_name}es WHERE user_id=${user_id}`
+  ).then((favorites_ids) =>
+    Object.keys(favorites_ids).map(
+      (k) => favorites_ids[k][`${category_name}_id`]
+    )
   );
+  return favorites_ids;
 }
 
-async function getFavoritePlayers(user_id) {
-  const player_ids = await DButils.execQuery(
-    `select player_id from FavoritePlayers where user_id='${user_id}'`
-  );
-  return player_ids;
-}
-
-async function verify_category(category_name){
+async function verify_category(category_name,categories){
   if(
-    Object.values(favorite_categories).find
+    Object.values(categories).find
   ( (possible_category) => possible_category === category_name)
    === 'undefined'){
     throw { status: 400, message: "invalid category name" };
@@ -38,25 +35,18 @@ async function verify_category(category_name){
 }
 
 
- function get_favorites_handler(category_name){
-  if (category_name == favorite_categories.PLAYER){
-    return players_utils.getPlayersInfo;
+ function get_info_handler(category_name){
+  const utils = require(`./${plural(category_name)}_utils`);
+  return utils.get_info;
  }
- else if(category_name == favorite_categories.MATCH){
-    return match_utils.get_matches_info;
- }
- else{ // teams
-      return players_utils.getPlayersByTeam;
- }
-}
+
+
  
 
-
-exports.markPlayerAsFavorite = markPlayerAsFavorite;
-exports.getFavoritePlayers = getFavoritePlayers;
 exports.role_to_role_name = role_to_role_name;
 exports.favorite_categories = favorite_categories;
 exports.verify_category = verify_category;
-exports.get_favorites_handler = get_favorites_handler;
+exports.get_info_handler = get_info_handler;
+exports.get_favorites_ids = get_favorites_ids;
 
 
