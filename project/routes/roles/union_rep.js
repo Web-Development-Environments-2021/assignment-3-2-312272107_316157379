@@ -5,12 +5,22 @@ const union_rep_utils = require("../utils/roles/union_rep_utils");
 const axios = require("axios");
 let fs = require('fs');
 const { match } = require("assert");
+const { role_to_role_name } = require("../utils/users_utils");
 let logStream = fs.createWriteStream('log.txt', {flags: 'a'});
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
   
 const LEAGUE_ID = 271; // SuperLiga
 
-
+router.use(async function (req, res, next) {
+    await DButils.execQuery(
+      `SELECT * FROM dbo.user_roles (WHERE user_id = ${req.session.user_id} AND role = '${role_to_role_name.UNION_REP}')`
+    ).then( (user) => {
+      if (!user)
+        throw { status: 400, message: "user donwt have premission" };
+    });
+    next();
+});
+'/matches'
 router.post("/matches", async (req, res, next) => {
 try {
 

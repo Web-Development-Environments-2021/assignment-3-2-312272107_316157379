@@ -80,9 +80,7 @@ app.use(function (req, res, next) {
 
 // Routings
 app.use("/users", users);
-
 app.use("/users/union_rep", union_rep);
-
 app.use("/league", league);
 app.use("/teams", teams);
 app.use(auth);
