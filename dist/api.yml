@@ -248,7 +248,7 @@ paths:
           type: string
       responses:
         "200":
-          description: "The {category_name} was successfully saved as a favorite"
+          description: ''
         "400":
           description: "invalid category name"
     post:
@@ -270,6 +270,7 @@ paths:
           type: string
       responses:
         '200':
+          description: "The {category_name} was successfully saved as a favorite"
         "400":
           description: "invalid category name"
           

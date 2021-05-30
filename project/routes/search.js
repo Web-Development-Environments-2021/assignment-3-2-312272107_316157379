@@ -26,7 +26,7 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
         }
       ).then(map(search_result => search_result.id));
     const info_getter_function = users_utils.get_info_handler(category_name);
-    search_results_information = info_getter_function(search_results_ids_for_name);
+    const search_results_information = info_getter_function(search_results_ids_for_name);
     
     res.send(search_results_information);
     logStream.end(`search for ${category_name_as_plural} was successful`);

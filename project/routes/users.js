@@ -4,6 +4,7 @@ const DButils = require("./utils/DButils");
 const users_utils = require("./utils/users_utils");
 let fs = require("fs");
 let logStream = fs.createWriteStream("log.txt", { flags: "a" });
+const {plural} = require('pluralize'); // requires testing
 
 /**
  * Authenticate all incoming requests by middleware
@@ -34,8 +35,8 @@ router.post("/favorites/:category_name", async (req, res, next) => {
     const user_id = req.body.user_id;
 
     const favorite_id = req.body.favorite_id;
-    await DButils.execQuery(
-      `INSERT INTO dbo.favorite_${category_name}es VALUES (${user_id},${favorite_id})`
+    await DButils.execQuery( 
+      `INSERT INTO dbo.favorite_${plural(category_name)} VALUES (${user_id},${favorite_id})`
     );
     const success_message = `The ${category_name} was successfully saved as a favorite`;
     res.status(201).send(success_message);
@@ -55,6 +56,7 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     // const user_id = req.session.user_id;
     const user_id = req.body.user_id;
 
+    // get the favorite "category_name" ids from the local db 
     const favorites_ids = await users_utils.get_favorites_ids(category_name,user_id);
 
     // get and use the correct function to return information based on category, using the ids extracted

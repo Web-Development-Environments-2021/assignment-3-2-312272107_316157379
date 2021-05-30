@@ -45,7 +45,4 @@ function extract_relevant_data(players_info) {
   });
 }
 
-
-
 exports.get_info = get_info;
-exports.extractRelevantPlayerData = extract_relevant_info;

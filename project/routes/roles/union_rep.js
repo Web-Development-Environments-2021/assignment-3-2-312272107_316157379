@@ -4,6 +4,7 @@ const DButils = require("../utils/DButils");
 const union_rep_utils = require("../utils/roles/union_rep_utils");
 const axios = require("axios");
 let fs = require('fs');
+const { match } = require("assert");
 let logStream = fs.createWriteStream('log.txt', {flags: 'a'});
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
   
@@ -27,7 +28,7 @@ try {
           api_token: process.env.api_token,
         },
       });
-    await DButils.execQuery(
+    const match_id = await DButils.execQuery(
         `
         DECLARE @date date = '${date}';
         DECLARE @time time = '${hour}';
@@ -39,7 +40,7 @@ try {
     
     
     const match_creation_message = 'match created succesfully';
-    res.status(201).send(match_creation_message);
+    res.status(201).send(match_id);
     logStream.end(match_creation_message);
   } catch (error) {
     // logStream.end(error.message); TODO need to return to this later
@@ -51,6 +52,7 @@ router.post("/matches/:match_id/event_log", async (req, res, next) => {
   try {
       
       let {minute_in_game,event_type,event_description} = req.body; 
+      // classify event type to either existing one or other
       if (Object.values(union_rep_utils.event_types).find( (value) => value === event_type) === 'undefined'){
         event_type = union_rep_utils.event_types.other;
       }
