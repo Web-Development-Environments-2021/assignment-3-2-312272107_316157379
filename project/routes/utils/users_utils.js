@@ -40,6 +40,12 @@ async function verify_category(category_name,categories){
   return utils.get_info;
  }
 
+ function get_id_extraction_handler(category_name){
+  const utils = require(`./${plural(category_name)}_utils`);
+  return utils.extract_ids;
+ }
+
+
 
  
 
@@ -48,5 +54,6 @@ exports.favorite_categories = favorite_categories;
 exports.verify_category = verify_category;
 exports.get_info_handler = get_info_handler;
 exports.get_favorites_ids = get_favorites_ids;
+exports.get_id_extraction_handler = get_id_extraction_handler;
 
 

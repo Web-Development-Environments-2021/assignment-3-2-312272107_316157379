@@ -29,5 +29,9 @@ function extract_relevant_data(teams_info) {
     };
   });
 }
+function extract_ids(teams_objects){
+  return teams_objects.map((team_object) => team_object.team_id);
+}
 
 exports.get_info = get_info;
+exports.extract_ids = extract_ids;

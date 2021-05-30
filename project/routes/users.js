@@ -60,8 +60,7 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     const favorites_ids = await users_utils.get_favorites_ids(category_name,user_id);
 
     // get and use the correct function to return information based on category, using the ids extracted
-    const favorites_handler_function =
-      await users_utils.get_info_handler(category_name);
+    const favorites_handler_function = users_utils.get_info_handler(category_name);
     const favorites = await favorites_handler_function(favorites_ids);
 
     res.status(200).send(favorites);

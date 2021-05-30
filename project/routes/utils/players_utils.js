@@ -44,5 +44,14 @@ function extract_relevant_data(players_info) {
     };
   });
 }
+function extract_ids(players_objects){
+  const something = Object.keys(players_objects).map(k => players_objects[k].player_id);
+  return something;
+  
+
+  // return Object.keys(players_objects).map(
+  //   (k) => players_objects[k][player_id]);
+}
 
 exports.get_info = get_info;
+exports.extract_ids = extract_ids;
