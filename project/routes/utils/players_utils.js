@@ -2,19 +2,19 @@ const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 // const TEAM_ID = "85";
 
-async function getPlayerIdsByTeam(team_id) {
-  let player_ids_list = [];
-  const team = await axios.get(`${api_domain}/teams/${team_id}`, {
-    params: {
-      include: "squad",
-      api_token: process.env.api_token,
-    },
-  });
-  team.data.data.squad.data.map((player) =>
-    player_ids_list.push(player.player_id)
-  );
-  return player_ids_list;
-}
+// async function getPlayerIdsByTeam(team_id) {
+//   let player_ids_list = [];
+//   const team = await axios.get(`${api_domain}/teams/${team_id}`, {
+//     params: {
+//       include: "squad",
+//       api_token: process.env.api_token,
+//     },
+//   });
+//   team.data.data.squad.data.map((player) =>
+//     player_ids_list.push(player.player_id)
+//   );
+//   return player_ids_list;
+// }
 
 async function get_info(players_ids) {
   let promises = [];
@@ -23,13 +23,14 @@ async function get_info(players_ids) {
       axios.get(`${api_domain}/players/${id}`, {
         params: {
           api_token: process.env.api_token,
-          include: "team",
+          include: `'team','stats'`,
         },
       })
     )
   );
-  let players_info = await Promise.all(promises);
-  return extract_relevant_data(players_info);
+  const players_found = await Promise.all(promises);
+  const players_in_league = filter_by_league(players_found);
+  return extract_relevant_data(players_in_league);
 }
 
 function extract_relevant_data(players_info) {
@@ -49,9 +50,16 @@ function extract_ids(players_objects){
   const players_ids = Object.keys(players_objects).map(k => players_objects[k].player_id);
   return players_ids;
   
+}
 
-  // return Object.keys(players_objects).map(
-  //   (k) => players_objects[k][player_id]);
+function filter_by_league(players_objects,league_id){
+  players_in_league = [];
+  players_objects.map( (player_object) => {
+    if (player_object.data.data.stats.data.league_id == league_id){
+      players_in_league.push(player_object.data.data);
+    }
+  });
+  return players_in_league;
 }
 
 exports.get_info = get_info;

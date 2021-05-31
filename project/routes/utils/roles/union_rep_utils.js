@@ -1,37 +1,23 @@
 const axios = require("axios");
-const { search_team_by_name } = require("../teams_utils");
+const search_utils = require("../search_utils");
+const teams_utils = require("../teams_utils");
 const LEAGUE_ID = 271; // SuperLiga
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 
 async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
-  let teams_matching_name = await search_team_by_name("teams", team_name).then(
+  let teams_matching_name = await search_utils.search_by_category_and_query("teams", team_name,league_id).then(
     (teams_found) => teams_found.data.data
   );
-  let i = 0;
-  let team_in_league;
-  while (i < teams_matching_name.length) {
-    let team_leagues = await axios.get(
-      `${api_domain}/teams/${teams_matching_name[i].id}/current`,
-      {
-        params: {
-          api_token: process.env.api_token,
-        },
-      }
-    );
-    team_leagues = team_leagues.data.data;
-    team_in_league = team_leagues.find(
-      (team_league) => team_league.league_id === LEAGUE_ID
-    );
-    if (typeof team_in_league !== "undefined") {
-      return teams_matching_name[i];
-    }
-    i++;
+  const team_in_league = teams_utils.get_info(teams_matching_name,league_id);
+  if (team_in_league.length != 1){
+    throw {
+      status: 400,
+      message: `could not match ${team_name} to a team in the given league`,
+    } 
   }
-  throw {
-    status: 400,
-    message: `could not match ${team_name} to a team in the given league`,
-  };
+  return team_in_league;
 }
+
 
 const event_types = {
   goal: "Goal",

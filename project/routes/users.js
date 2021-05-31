@@ -28,7 +28,7 @@ router.use(async function (req, res, next) {
 router.post("/favorites/:category_name", async (req, res, next) => {
   try {
     const category_name = req.params.category_name;
-    await users_utils.verify_favorites_category(category_name,users_utils.favorite_categories);
+    await users_utils.verify_category(category_name,users_utils.favorite_categories);
 
     //testing purposes only
     // const user_id = req.session.user_id;
@@ -37,7 +37,7 @@ router.post("/favorites/:category_name", async (req, res, next) => {
     const category_name_as_plural = plural(category_name);
 
     const favorite = await DButils.execQuery(
-      `SELECT * FROM dbo.favorite_${category_name_as_plural} WHERE user_id=${user_id} AND ${category_name}_id= ${favorite_id}`
+      `SELECT * FROM dbo.favorite_${category_name_as_plural} WHERE (user_id='${user_id}') AND (${category_name}_id= '${favorite_id}')`
     );
 
     if (favorite.length > 0 )

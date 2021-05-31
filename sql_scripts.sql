@@ -106,4 +106,4 @@
 
 -- select * from user_roles where user_id = 10;
 
-select * from matches
+select * from dbo.favorite_matches

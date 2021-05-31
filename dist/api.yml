@@ -4,12 +4,7 @@ info:
   version: "1.0.0"
   title: Assignment 3.1 API
   contact:
-    email: avichaie@post.bgu.ac.il #can't add more emails?
-tags: #???
-  - name: admins
-    description: Secured Admin-only calls
-  - name: developers
-    description: Operations available to regular developers
+    email: avichaie@post.bgu.ac.il 
 paths:
   /register:  
     post:
@@ -99,6 +94,7 @@ paths:
       tags: 
         - matches
         - union_rep
+        - tested
       summary: set_new_match 
       requestBody:
         required: true
@@ -233,6 +229,7 @@ paths:
     get:
       tags: 
         - favorites
+        - tested
       summary: get_favorites 
       description: fetch all favorite {category_name}s of {user_id}
       parameters:
@@ -254,6 +251,7 @@ paths:
     post:
       tags: 
         - favorites
+        - tested
       summary: add_to_favorites
       description: fetch a {category_name} to {user_id}'s favorites
       parameters:
@@ -268,6 +266,12 @@ paths:
         description: currently supporting matches only
         schema:
           type: string
+      - name: favorite_id
+        in: query
+        required: true
+        description: identifies the favorite {category_name} to add
+        schema:
+          type: integer
       responses:
         '200':
           description: "The {category_name} was successfully saved as a favorite"

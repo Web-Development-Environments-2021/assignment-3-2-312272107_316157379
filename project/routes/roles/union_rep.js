@@ -11,14 +11,13 @@ const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const LEAGUE_ID = 271; // SuperLiga
 
 router.use(async function (req, res, next) {
-  await DButils.execQuery(
-    `SELECT * FROM dbo.user_roles WHERE user_id=${req.body.user_id}`
-  ).then((users) => {
-      if (!users.find((x) => x.user_role === role_to_role_name.SUBSCRIBER)) {
-        throw { status: 400, message: "user dones't have premission" };
-      }
-    })
-    .catch((err) => next(err));
+  const users = await DButils.execQuery(
+    `SELECT * FROM dbo.user_roles WHERE (user_id = '${req.body.user_id}') AND (user_role = '${role_to_role_name.UNION_REP}')`
+  );
+  if (users.length == 0) {
+    throw { status: 400, message: "user dones't have premission" };
+  }
+  //   .catch((err) => next(err));
   next();
 });
 
@@ -36,7 +35,6 @@ router.post("/matches", async (req, res, next) => {
       LEAGUE_ID
     );
 
-
     const venue = await axios.get(
       `${api_domain}/venues/${home_team.venue_id}`,
       {
@@ -45,7 +43,7 @@ router.post("/matches", async (req, res, next) => {
         },
       }
     );
-    
+
     const match_id = await DButils.execQuery(
       `
         DECLARE @date date = '${date}';
