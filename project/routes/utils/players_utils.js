@@ -1,36 +1,32 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
-const info_include_param = `team,stats`;
+const info_include_param = `team,stats,position`;
 
-// async function getPlayerIdsByTeam(team_id) {
-//   let player_ids_list = [];
-//   const team = await axios.get(`${api_domain}/teams/${team_id}`, {
-//     params: {
-//       include: "squad",
-//       api_token: process.env.api_token,
-//     },
-//   });
-//   team.data.data.squad.data.map((player) =>
-//     player_ids_list.push(player.player_id)
-//   );
-//   return player_ids_list;
-// }
+
 function get_info(players_objects, league_id) {
   const players_in_league = filter_by_league(players_objects, league_id);
-  return extract_relevant_data(players_in_league);
+  return extract_relevant_search_data(players_in_league);
 }
 
-function extract_relevant_data(players_info) {
+function extract_relevant_search_data(players_info) {
   return players_info.map((player_info) => {
-    const { player_id, fullname, image_path, position_id } =
+    const { player_id,common_name,nationality,birthdate,birthcountry,height,weight, fullname, image_path } =
       player_info;
-    const { name } = player_info.team.data;
+    const { team_name } = player_info.team.data;
+    const { position } = player_info.position.data.name;
+
     return {
       id: player_id,
       name: fullname,
+      common_name: common_name,
+      nationality: nationality,
+      country: birthcountry,
+      birth_date: birthdate,
+      height: height,
+      weight: weight,  
       image: image_path,
-      position: position_id,
-      team_name: name,
+      position: position,
+      team_name: team_name,
     };
   });
 }
@@ -57,6 +53,12 @@ async function get_favorites_info(players_ids, category, league_id) {
   return get_info(players_objects, league_id);
 }
 
+function extract_releveant_information_for_team_page(players){
+    return players.map(player => player.name);
+}
+
+
 exports.get_info = get_info;
 exports.info_include_param = info_include_param;
 exports.get_favorites_info = get_favorites_info;
+exports.extract_releveant_information_for_team_page = extract_releveant_information_for_team_page;
