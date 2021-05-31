@@ -4,6 +4,7 @@ const DButils = require("./utils/DButils");
 const bcrypt = require("bcryptjs");
 const { role_to_role_name } = require("./utils/users_utils");
 const fs = require("fs");
+const { deprecate } = require("util");
 const logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
 router.post("/register", async (req, res, next) => {
@@ -31,16 +32,18 @@ router.post("/register", async (req, res, next) => {
     req.body.password = hash_password;
 
     // add the new username
-    await DButils.execQuery(
-      `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic) 
-      VALUES ('${username}', '${hash_password}','${first_name}','${last_name}','${email}','${profile_pic}')`
-    );
+    const user_id = await DButils.execQuery(
+      `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic,last_search) 
+       OUTPUT inserted.user_id 
+      VALUES ('${username}', '${hash_password}','${first_name}','${last_name}','${email}','${profile_pic}','')`
+    ).then(user_id_as_obj => user_id_as_obj[0].user_id);
     // add permissions of subscriber to new user.
 
-    await DButils.execQuery(
-      `INSERT INTO dbo.user_roles (user_id,role) VALUES
-      ((SELECT user_id FROM dbo.users WHERE username='${username}'), '${role_to_role_name.SUBSCRIBER}')`
-    );
+    // @deprecate
+    // await DButils.execQuery(
+    //   `INSERT INTO dbo.user_roles (user_id,user_role) VALUES
+    //   (${user_id}, '${role_to_role_name.SUBSCRIBER}')`
+    // );
 
     const user_creation_message = `user '${username}' succesfully added\n`;
     res.status(201).send(user_creation_message);

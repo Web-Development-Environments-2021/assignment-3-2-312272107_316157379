@@ -1,5 +1,6 @@
 const DButils = require("./DButils");
 const {plural} = require('pluralize'); // requires testing
+const { get } = require("../users");
 
 const role_to_role_name = {
     SUBSCRIBER: 'subscriber',
@@ -32,26 +33,35 @@ async function verify_category(category_name,categories){
   }
 }
 
-
- function get_info_handler(category_name){
-  const utils = require(`./${plural(category_name)}_utils`);
-  return utils.get_info;
+ function get_utils_by_category(category_name){
+    const utils = require(`./${plural(category_name)}_utils`);
+    return utils;
  }
 
- function get_id_extraction_handler(category_name){
-  const utils = require(`./${plural(category_name)}_utils`);
-  return utils.extract_ids;
- }
-
-
+async function get_object_by_id(ids,category_name) {
+  const utils = get_utils_by_category(category_name);
+  let promises = [];
+  ids.map((id) =>
+    promises.push(
+      axios.get(`${api_domain}/${plural(category_name)}/${id}`, {
+        params: {
+          api_token: process.env.api_token,
+          include: utils.info_include_param
+        },
+      })
+    )
+  );
+  const objects = await Promise.all(promises);
+  return objects.data.data;
+}
 
  
 
 exports.role_to_role_name = role_to_role_name;
 exports.favorite_categories = favorite_categories;
 exports.verify_category = verify_category;
-exports.get_info_handler = get_info_handler;
+exports.get_utils_by_category = get_utils_by_category
 exports.get_favorites_ids = get_favorites_ids;
-exports.get_id_extraction_handler = get_id_extraction_handler;
+exports.get_object_by_id = get_object_by_id;
 
 

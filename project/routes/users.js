@@ -58,6 +58,8 @@ router.post("/favorites/:category_name", async (req, res, next) => {
 
 router.get("/favorites/:category_name", async (req, res, next) => {
   try {
+    const LEAGUE_ID = 271; // SuperLiga, generally could be receieved as query param
+
     const category_name = req.params.category_name;
     await users_utils.verify_category(category_name,users_utils.favorite_categories);
 
@@ -68,11 +70,14 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     // get the favorite "category_name" ids from the local db 
     const favorites_ids = await users_utils.get_favorites_ids(category_name,user_id);
 
-    // get and use the correct function to return information based on category, using the ids extracted
-    const favorites_handler_function = users_utils.get_info_handler(category_name);
-    const favorites = await favorites_handler_function(favorites_ids);
+    // get objects from ids
+    
 
-    res.status(200).send(favorites);
+    // get and use the correct function to return information based on category, using the ids extracted
+    const favorites_utils = await users_utils.get_utils_by_category(category_name);
+    const favorites_info = await favorites_utils.get_favorites_info(favorites_ids,category_name,LEAGUE_ID);
+
+    res.status(200).send(favorites_info);
     logStream.end("successfully returned favorites");
   } catch (error) {
     logStream.end(error.message);

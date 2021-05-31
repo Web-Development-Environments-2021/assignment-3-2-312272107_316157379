@@ -1,6 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
-// const TEAM_ID = "85";
+const info_include_param = `team,stats`;
 
 // async function getPlayerIdsByTeam(team_id) {
 //   let player_ids_list = [];
@@ -15,28 +15,16 @@ const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 //   );
 //   return player_ids_list;
 // }
-
-async function get_info(players_ids) {
-  let promises = [];
-  players_ids.map((id) =>
-    promises.push(
-      axios.get(`${api_domain}/players/${id}`, {
-        params: {
-          api_token: process.env.api_token,
-          include: `'team','stats'`,
-        },
-      })
-    )
-  );
-  const players_found = await Promise.all(promises);
-  const players_in_league = filter_by_league(players_found);
+function get_info(players_objects, league_id) {
+  const players_in_league = filter_by_league(players_objects, league_id);
   return extract_relevant_data(players_in_league);
 }
 
 function extract_relevant_data(players_info) {
   return players_info.map((player_info) => {
-    const { player_id,fullname, image_path, position_id } = player_info.data.data;
-    const { name } = player_info.data.data.team.data;
+    const { player_id, fullname, image_path, position_id } =
+      player_info;
+    const { name } = player_info.team.data;
     return {
       id: player_id,
       name: fullname,
@@ -46,21 +34,29 @@ function extract_relevant_data(players_info) {
     };
   });
 }
-function extract_ids(players_objects){
-  const players_ids = Object.keys(players_objects).map(k => players_objects[k].player_id);
-  return players_ids;
-  
-}
 
-function filter_by_league(players_objects,league_id){
-  players_in_league = [];
-  players_objects.map( (player_object) => {
-    if (player_object.data.data.stats.data.league_id == league_id){
-      players_in_league.push(player_object.data.data);
+function filter_by_league(players_objects, league_id) {
+  let players_in_league = [];
+  players_objects.data.data.map((player_object) => {
+    const player_stats_data = player_object.stats.data;
+    if (
+      player_stats_data.length > 0 &&
+      player_stats_data[0].league_id == league_id
+    ) {
+      players_in_league.push(player_object);
     }
   });
   return players_in_league;
 }
 
+async function get_favorites_info(players_ids, category, league_id) {
+  const players_objects = await users_utils.get_object_by_id(
+    players_ids,
+    category
+  );
+  return get_info(players_objects, league_id);
+}
+
 exports.get_info = get_info;
-exports.extract_ids = extract_ids;
+exports.info_include_param = info_include_param;
+exports.get_favorites_info = get_favorites_info;

@@ -1,6 +1,7 @@
 --***************************************************
 
 --Tables
+
 -- CREATE TABLE [dbo].[users](
 -- 	[user_id] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,    
 --     [username] [varchar](50) NOT NULL UNIQUE,
@@ -9,6 +10,7 @@
 -- 	[last_name] [varchar](50) NULL,
 -- 	[email] [varchar](50) NULL,
 -- 	[profile_pic] [varchar](50) NULL,
+--  [last_search] [varchar](50) NULL
 -- )
 
 
@@ -52,12 +54,14 @@
 --     FOREIGN KEY (match_id) REFERENCES dbo.matches(match_id),
 --     PRIMARY KEY(user_id,match_id),
 -- );
+
 -- CREATE TABLE dbo.favorite_teams(
 --     user_id [int],
 --     team_id [int],
 -- 	FOREIGN KEY (user_id) REFERENCES dbo.users(user_id),
 --     PRIMARY KEY(user_id,team_id),
 -- );
+
 -- CREATE TABLE dbo.favorite_players(
 --     user_id [int],
 --     player_id [int],
@@ -93,17 +97,7 @@
 
 
 -- Drop Table dbo.matches_event_log 
-
+-- DROP TABLE dbo.users;
+-- DROP TABLE dbo.favorite_matches;
+-- DROP TABLE dbo.user_roles;
 --***************************************************
-
-
--- INSERT INTO dbo.favorite_matches
--- VALUES (10,8)
-
--- SELECT * FROM dbo.user_roles WHERE (user_id=10) AND (user_role= 'subscriber')
-
--- insert into dbo.user_roles values(10,'subscriber');
-
--- select * from user_roles where user_id = 10;
-
-select * from dbo.favorite_matches
