@@ -4,17 +4,18 @@ const DButils = require("../utils/DButils");
 const union_rep_utils = require("../utils/roles/union_rep_utils");
 const axios = require("axios");
 let fs = require("fs");
-const {role_to_role_name} = require('../utils/users_utils');
+const { role_to_role_name } = require("../utils/users_utils");
 let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 
 const LEAGUE_ID = 271; // SuperLiga
 
 router.use(async function (req, res, next) {
-  await DButils.execQuery(`SELECT user_role FROM dbo.user_roles Where user_id = ${req.body.user_id}`)
-    .then((users) => {
+  await DButils.execQuery(
+    `SELECT * FROM dbo.user_roles WHERE user_id=${req.body.user_id}`
+  ).then((users) => {
       if (!users.find((x) => x.user_role === role_to_role_name.SUBSCRIBER)) {
-        throw { status: 400, message: "user don't have premission" }
+        throw { status: 400, message: "user dones't have premission" };
       }
     })
     .catch((err) => next(err));
@@ -34,11 +35,7 @@ router.post("/matches", async (req, res, next) => {
       away_team_name,
       LEAGUE_ID
     );
-    if (home_team === "undefined" || away_team === "undefined")
-      throw {
-        status: 400,
-        message: "match could not be added,teams invalid or not in league",
-      };
+
 
     const venue = await axios.get(
       `${api_domain}/venues/${home_team.venue_id}`,
@@ -48,12 +45,13 @@ router.post("/matches", async (req, res, next) => {
         },
       }
     );
+    
     const match_id = await DButils.execQuery(
       `
         DECLARE @date date = '${date}';
         DECLARE @time time = '${hour}';
         INSERT INTO dbo.matches(match_date, hour,home_team,away_team,venue)
-        OUTPUT Inserted.match_id
+        OUTPUT INSERTED.match_id
         VALUES (@date,@time ,'${home_team_name}','${away_team_name}','${venue.data.data.name}');
         `
     );

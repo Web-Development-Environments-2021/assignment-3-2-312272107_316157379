@@ -18,15 +18,8 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
 
     // supports either only first name or last name or full name, but has to be a valid.
     // returns object based on category name and name query
-    let search_results_ids_for_name = await axios
-      .get(
-        `${api_domain}/${category_name_as_plural}/search/${req.params.name_query}`,
-        {
-          params: {
-            api_token: process.env.api_token,
-          },
-        }
-      );
+    let search_results_ids_for_name = await teams_utils.search_team_by_name(category_name_as_plural,req.params.name_query);
+    
     // ids can be with category name or without so unique method is created for each participant
     const extraction_handler_function = users_utils.get_id_extraction_handler(category_name);
     const info_getter_function = users_utils.get_info_handler(category_name);

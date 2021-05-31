@@ -34,9 +34,10 @@ async function get_info(players_ids) {
 
 function extract_relevant_data(players_info) {
   return players_info.map((player_info) => {
-    const { fullname, image_path, position_id } = player_info.data.data;
+    const { player_id,fullname, image_path, position_id } = player_info.data.data;
     const { name } = player_info.data.data.team.data;
     return {
+      id: player_id,
       name: fullname,
       image: image_path,
       position: position_id,
@@ -45,8 +46,8 @@ function extract_relevant_data(players_info) {
   });
 }
 function extract_ids(players_objects){
-  const something = Object.keys(players_objects).map(k => players_objects[k].player_id);
-  return something;
+  const players_ids = Object.keys(players_objects).map(k => players_objects[k].player_id);
+  return players_ids;
   
 
   // return Object.keys(players_objects).map(

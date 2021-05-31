@@ -33,13 +33,22 @@ router.post("/favorites/:category_name", async (req, res, next) => {
     //testing purposes only
     // const user_id = req.session.user_id;
     const user_id = req.body.user_id;
-
     const favorite_id = req.body.favorite_id;
+    const category_name_as_plural = plural(category_name);
+
+    const favorite = await DButils.execQuery(
+      `SELECT * FROM dbo.favorite_${category_name_as_plural} WHERE user_id=${user_id} AND ${category_name}_id= ${favorite_id}`
+    );
+
+    if (favorite.length > 0 )
+      throw { status: 409, message: "game already in favorites" };
+
+
     await DButils.execQuery( 
-      `INSERT INTO dbo.favorite_${plural(category_name)} VALUES (${user_id},${favorite_id})`
+      `INSERT INTO dbo.favorite_${category_name_as_plural} VALUES (${user_id},${favorite_id})`
     );
     const success_message = `The ${category_name} was successfully saved as a favorite`;
-    res.status(201).send(success_message);
+    res.status(201).send(favorite_id);
     logStream.end(success_message);
   } catch (error) {
     logStream.end(error.message);

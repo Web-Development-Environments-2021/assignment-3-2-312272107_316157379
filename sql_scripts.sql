@@ -11,12 +11,17 @@
 -- 	[profile_pic] [varchar](50) NULL,
 -- )
 
+
+
+
 -- CREATE TABLE user_roles(
 -- 	user_id int,
---     role varchar(30) NOT NULL,
+--  user_role varchar(30) NOT NULL,
 -- 	FOREIGN KEY (user_id) REFERENCES dbo.users(user_id),
---     PRIMARY KEY(user_id,role),
+--     PRIMARY KEY(user_id,user_role),
 -- );
+
+
 
 -- CREATE TABLE [dbo].[matches](
 -- 	[match_id] [int] PRIMARY KEY IDENTITY(1,1),    
@@ -94,3 +99,11 @@
 
 -- INSERT INTO dbo.favorite_matches
 -- VALUES (10,8)
+
+-- SELECT * FROM dbo.user_roles WHERE (user_id=10) AND (user_role= 'subscriber')
+
+-- insert into dbo.user_roles values(10,'subscriber');
+
+-- select * from user_roles where user_id = 10;
+
+select * from matches
