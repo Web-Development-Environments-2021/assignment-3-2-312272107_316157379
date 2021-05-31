@@ -62,39 +62,67 @@ paths:
           description: "returned league details"
         "404":
           description: "couldn't supply league's details, league not found"
-  /league/matches:
-    get:
-      tags: 
-        - league
-      summary: get_matches_in_league
-      description: get all matches in SuperLiga. 
-      responses:
-        "200":
-          description: "returned matches that match team id"
-        "404":
-          description: "couldn't supply league's details, league not found"
-  /matches/{match_id}:
+  /matches:
     get:
       tags: 
         - matches
-      summary: get_match_by_id 
+      summary: get_matches_in_cycle 
+      description: get all matches in "cycle";
+      responses:
+        "200":
+          description: "successfully retrieved matches"
+        "400":
+          description: "couldn't retrieve matches"
+          
+  /team/get_page_details/{team_id}:
+    get:
+      tags: 
+        - teams
+      description: get matches and players information for {team_id} 
       parameters: 
       - in: "path"
-        name: match_id
+        name: team_id
         required: true
         schema:
           type: integer
       responses:
         "200":
-          description: "returned match that matches id"
-        "404":
-          description: "invalid match id"
+          description: successfully retrieved team's details
+        "400":
+          description: couldnt retrieve team's details
+          
+  # /league/matches:
+  #   get:
+  #     tags: 
+  #       - league
+  #     summary: get_matches_in_league
+  #     description: get all matches in SuperLiga. 
+  #     responses:
+  #       "200":
+  #         description: "returned matches that match team id"
+  #       "404":
+  #         description: "couldn't supply league's details, league not found"
+  # /matches/{match_id}:
+  #   get:
+  #     tags: 
+  #       - matches
+  #     summary: get_match_by_id 
+  #     parameters: 
+  #     - in: "path"
+  #       name: match_id
+  #       required: true
+  #       schema:
+  #         type: integer
+  #     responses:
+  #       "200":
+  #         description: "returned match that matches id"
+  #       "404":
+  #         description: "invalid match id"
   /users/union_rep/matches:
     post:
       tags: 
         - matches
         - union_rep
-        - tested
       summary: set_new_match 
       requestBody:
         required: true
@@ -125,55 +153,55 @@ paths:
           description: "event added successfully"
         '404':
           description: "match could not be found"
-  /players/{player_id}:
-    get:
-      tags: 
-        - players
-      summary: get_player_by_id 
-      parameters: 
-      - in: "path"
-        name: player_id
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: "returned player that matches player id"
-        "404":
-          description: "invalid player id"
-  /users/{user_id}:   
-    get:
-      tags: 
-        - users
-      summary: get_user_by_id 
-      parameters: 
-      - in: "path"
-        name: user_id
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: "returned user that matches user id"
-        "404":
-          description: "invalid user id"
-  /teams/{team_id}:   
-    get:
-      tags: 
-        - teams
-      summary: get_team_by_id 
-      parameters: 
-      - in: "path"
-        name: team_id
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: "returned team that matches team id"
-        "404":
-          description: "invalid team id"
-  /players/search/{player_name}:
+  # /players/{player_id}:
+  #   get:
+  #     tags: 
+  #       - players
+  #     summary: get_player_by_id 
+  #     parameters: 
+  #     - in: "path"
+  #       name: player_id
+  #       required: true
+  #       schema:
+  #         type: integer
+  #     responses:
+  #       "200":
+  #         description: "returned player that matches player id"
+  #       "404":
+  #         description: "invalid player id"
+  # /users/{user_id}:   
+  #   get:
+  #     tags: 
+  #       - users
+  #     summary: get_user_by_id 
+  #     parameters: 
+  #     - in: "path"
+  #       name: user_id
+  #       required: true
+  #       schema:
+  #         type: integer
+  #     responses:
+  #       "200":
+  #         description: "returned user that matches user id"
+  #       "404":
+  #         description: "invalid user id"
+  # /teams/{team_id}:   
+  #   get:
+  #     tags: 
+  #       - teams
+  #     summary: get_team_by_id 
+  #     parameters: 
+  #     - in: "path"
+  #       name: team_id
+  #       required: true
+  #       schema:
+  #         type: integer
+  #     responses:
+  #       "200":
+  #         description: "returned team that matches team id"
+  #       "404":
+  #         description: "invalid team id"
+  /search/{category_name}/{name_query}:
     get:
       tags: 
         - search
@@ -181,7 +209,12 @@ paths:
       description: get player by full or partial name query. 
       parameters: 
       - in: "path"
-        name: player_name
+        name: category_name
+        required: true
+        schema:
+          type: string
+      - in: "path"
+        name: name_query
         required: true
         schema:
           type: string
@@ -190,36 +223,18 @@ paths:
           description: "returned players that match name query"
         "404":
           description: "invalid name query, could not find players"
-  /teams/search/{team_name}:
+  /teams/{team_name}/matches:
     get:
       tags: 
         - teams
-        - search
-      summary: get_team_by_name
-      description: get team by full or partial name query. 
+      summary: get_matches_by_team_name
+      description: get all matches team has played in or will play in. 
       parameters: 
       - in: "path"
         name: team_name
         required: true
         schema:
           type: string
-      responses:
-        "200":
-          description: "returned teams that match name query"
-        "404":
-          description: "invalid name query, could not find teams"
-  /teams/{team_id}/matches:
-    get:
-      tags: 
-        - teams
-      summary: get_matches_by_team
-      description: get all matches team has played in or will play in. 
-      parameters: 
-      - in: "path"
-        name: team_id
-        required: true
-        schema:
-          type: integer
       responses:
         "200":
           description: "returned matches that match team id"
@@ -229,7 +244,6 @@ paths:
     get:
       tags: 
         - favorites
-        - tested
       summary: get_favorites 
       description: fetch all favorite {category_name}s of {user_id}
       parameters:
@@ -251,7 +265,6 @@ paths:
     post:
       tags: 
         - favorites
-        - tested
       summary: add_to_favorites
       description: fetch a {category_name} to {user_id}'s favorites
       parameters:

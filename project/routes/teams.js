@@ -23,7 +23,7 @@ router.get("/:team_name/matches", async (req, res, next) => {
   });
 
 
-router.get("/full_team_details/:team__id", async (req, res, next) => {
+router.get("/get_page_details/:team__id", async (req, res, next) => {
   try {
     const players_info = await players_utils.get_players_info_for_team_page(
       req.params.team__id
