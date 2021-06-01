@@ -4,7 +4,7 @@
 
 -- CREATE TABLE [dbo].[users](
 -- 	[user_id] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,    
---     [username] [varchar](50) NOT NULL UNIQUE,
+--  [username] [varchar](50) NOT NULL UNIQUE,
 -- 	[password] [varchar](50) NOT NULL,
 -- 	[first_name] [varchar](50) NULL,
 -- 	[last_name] [varchar](50) NULL,
@@ -27,13 +27,13 @@
 
 -- CREATE TABLE [dbo].[matches](
 -- 	[match_id] [int] PRIMARY KEY IDENTITY(1,1),    
---     [match_date] [date] NOT NULL,
--- 	[hour] [time] NOT NULL,
+--  [match_date_time] [datetime] NOT NULL,
 -- 	[home_team] [varchar](50) NOT NULL,
 -- 	[away_team] [varchar](50) NOT NULL,
 -- 	[venue] [varchar](50) NOT NULL,
--- 	[score] [varchar](50) NULL, 
--- )
+-- 	[score] [varchar](50) NULL,
+--  [referee_id] [int] NOT NULL
+-- );
 
 -- CREATE TABLE dbo.matches_event_log(
 -- 	   match_id [int],
@@ -100,6 +100,7 @@
 -- DROP TABLE dbo.users;
 -- DROP TABLE dbo.favorite_matches;
 -- DROP TABLE dbo.user_roles;
+-- Drop Table dbo.matches
 --***************************************************
 -- 
 -- UPDATE user_roles set user_role='union_representative' where user_id=8;
