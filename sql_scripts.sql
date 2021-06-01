@@ -1,7 +1,7 @@
 --***************************************************
 
 --Tables
-
+--CREATE
 -- CREATE TABLE [dbo].[users](
 -- 	[user_id] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,    
 --  [username] [varchar](50) NOT NULL UNIQUE,
@@ -32,7 +32,9 @@
 -- 	[away_team] [varchar](50) NOT NULL,
 -- 	[venue] [varchar](50) NOT NULL,
 -- 	[score] [varchar](50) NULL,
---  [referee_id] [int] NOT NULL
+--  [referee_id] [int] NOT NULL,
+--  [is_over] [bit] NOT NULL,
+
 -- );
 
 -- CREATE TABLE dbo.matches_event_log(
@@ -100,7 +102,7 @@
 -- DROP TABLE dbo.users;
 -- DROP TABLE dbo.favorite_matches;
 -- DROP TABLE dbo.user_roles;
--- Drop Table dbo.matches
+-- Drop Table dbo.matches;
 --***************************************************
 -- 
 -- UPDATE user_roles set user_role='union_representative' where user_id=8;
