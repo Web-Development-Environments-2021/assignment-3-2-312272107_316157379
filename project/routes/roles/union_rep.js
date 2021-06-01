@@ -23,7 +23,7 @@ router.use(async function (req, res, next) {
 
 router.post("/matches", async (req, res, next) => {
   try {
-    const { date, hour, home_team_name, away_team_name } = req.body;
+    const { date_time, home_team_name, away_team_name } = req.body;
 
     //verify that teams exist in league
     const home_team = await union_rep_utils.get_team_in_league(
@@ -44,13 +44,12 @@ router.post("/matches", async (req, res, next) => {
       }
     );
 
+    const referee_id = 1//need to change
     const match_id = await DButils.execQuery(
       `
-        DECLARE @date date = '${date}';
-        DECLARE @time time = '${hour}';
-        INSERT INTO dbo.matches(match_date, hour,home_team,away_team,venue)
+        INSERT INTO dbo.matches(match_date_time,home_team,away_team,venue,referee_id,is_over)
         OUTPUT INSERTED.match_id
-        VALUES (@date,@time ,'${home_team_name}','${away_team_name}','${venue.data.data.name}');
+        VALUES (convert(varchar,'${date_time}', 20),'${home_team_name}','${away_team_name}','${venue.data.data.name}',${referee_id},0);
         `
     );
 
