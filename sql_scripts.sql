@@ -103,4 +103,5 @@
 --***************************************************
 -- 
 -- UPDATE user_roles set user_role='union_representative' where user_id=8;
--- select * from dbo.user_roles where user_id=8 AND user_role='union_rep'; 
+-- select * from dbo.user_roles where user_id=8 AND user_role='union_rep';
+-- insert into dbo.matches values()

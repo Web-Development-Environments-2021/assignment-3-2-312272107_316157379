@@ -1,6 +1,8 @@
 const DButils = require("./DButils");
 const {plural} = require('pluralize'); // requires testing
 const { get } = require("../users");
+const axios = require("axios");
+const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 
 const role_to_role_name = {
     SUBSCRIBER: 'subscriber',
@@ -52,7 +54,7 @@ async function get_object_by_id(ids,category_name) {
     )
   );
   const objects = await Promise.all(promises);
-  return objects.data.data;
+  return objects;
 }
 
  
