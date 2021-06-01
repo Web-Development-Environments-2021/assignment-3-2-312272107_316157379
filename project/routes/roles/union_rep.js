@@ -12,7 +12,7 @@ const LEAGUE_ID = 271; // SuperLiga
 
 router.use(async function (req, res, next) {
   const users = await DButils.execQuery(
-    `SELECT * FROM dbo.user_roles WHERE (user_id = '${req.body.user_id}') AND (user_role = '${role_to_role_name.UNION_REP}')`
+    `SELECT * FROM dbo.user_roles WHERE user_id = ${req.body.user_id} AND user_role = '${role_to_role_name.UNION_REP}'`
   );
   if (users.length == 0) {
     throw { status: 400, message: "user dones't have premission" };
@@ -36,7 +36,7 @@ router.post("/matches", async (req, res, next) => {
     );
 
     const venue = await axios.get(
-      `${api_domain}/venues/${home_team.venue_id}`,
+      `${api_domain}/venues/${home_team[0].venue_id}`,
       {
         params: {
           api_token: process.env.api_token,

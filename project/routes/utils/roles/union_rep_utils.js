@@ -5,9 +5,7 @@ const LEAGUE_ID = 271; // SuperLiga
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 
 async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
-  let teams_matching_name = await search_utils.search_by_category_and_query("teams", team_name,league_id).then(
-    (teams_found) => teams_found.data.data
-  );
+  let teams_matching_name = await search_utils.search_by_category_and_query("teams", team_name,league_id);
   const team_in_league = teams_utils.get_info(teams_matching_name,league_id);
   if (team_in_league.length != 1){
     throw {

@@ -16,11 +16,12 @@ function get_info(teams_objects, league_id) {
 }
 function extract_relevant_data(teams_info) {
   return teams_info.map((team_info) => {
-    const { id, name, logo_path } = team_info;
+    const { id, name, logo_path,venue_id } = team_info;
     return {
       id: id,
       name: name,
       logo: logo_path,
+      venue_id: venue_id
     };
   });
 }
@@ -80,11 +81,11 @@ async function get_players_info_for_team_page(team_id,league_id=271) {
   const tmp_include_param = info_include_param;
   info_include_param = ''; // not taking any additional information atm
   
-  const players = await users_utils.get_object_by_id(player_ids,'team');
+  const players = await users_utils.get_object_by_id(player_ids,'players');
 
   info_include_param = tmp_include_param;
 
-  return players_utils.extract_releveant_information_for_team_page(players);
+  return players_utils.extract_relevant_information_for_team_page(players);
 
   
 }

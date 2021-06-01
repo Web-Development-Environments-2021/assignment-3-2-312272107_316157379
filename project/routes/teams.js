@@ -1,11 +1,9 @@
 var express = require("express");
 var router = express.Router();
-const players_utils = require("./utils/players_utils");
 const teams_utils = require("./utils/teams_utils");
-
-
-const DButils = require("./DButils");
 const LEAGUE_ID = 271;
+let fs = require("fs");
+let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
 
 router.get("/:team_name/matches", async (req, res, next) => {
@@ -25,7 +23,7 @@ router.get("/:team_name/matches", async (req, res, next) => {
 
 router.get("/get_page_details/:team__id", async (req, res, next) => {
   try {
-    const players_info = await players_utils.get_players_info_for_team_page(
+    const players_info = await teams_utils.get_players_info_for_team_page(
       req.params.team__id
     );
     const matches_query = `SELECT * from dbo.matches`;

@@ -53,7 +53,7 @@ async function get_favorites_info(players_ids, category, league_id) {
   return get_info(players_objects, league_id);
 }
 
-function extract_releveant_information_for_team_page(players){
+function extract_relevant_information_for_team_page(players){
     return players.map(player => player.name);
 }
 
@@ -61,4 +61,4 @@ function extract_releveant_information_for_team_page(players){
 exports.get_info = get_info;
 exports.info_include_param = info_include_param;
 exports.get_favorites_info = get_favorites_info;
-exports.extract_releveant_information_for_team_page = extract_releveant_information_for_team_page;
+exports.extract_relevant_information_for_team_page = extract_relevant_information_for_team_page;
