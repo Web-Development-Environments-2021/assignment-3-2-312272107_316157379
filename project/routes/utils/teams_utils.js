@@ -54,18 +54,7 @@ async function get_teams_matches(matches_query){
   return matches_full_info;
 }
 
-async function get_players_info_for_team_page(team_id,league_id=271) {
-  let team_with_players = await axios.get(`${api_domain}/teams/${team_id}`, {
-    params: {
-      include: "squad,league",
-      api_token: process.env.api_token,
-    },
-  });
-  team_with_players = filter_by_league(team_with_players,league_id);
-  // return get_players_by_team(team_with_players);
-}
-
-async function get_players_info_for_team_page(team_id,league_id=271) {
+async function get_player_and_team_info(team_id,league_id=271) {
   let player_ids = []; 
   let team_with_players = await axios.get(`${api_domain}/teams/${team_id}`, {
     params: {
@@ -85,8 +74,12 @@ async function get_players_info_for_team_page(team_id,league_id=271) {
 
   info_include_param = tmp_include_param;
 
-  return players_utils.extract_relevant_information_for_team_page(players);
-
+  const player_info = players_utils.extract_relevant_information_for_team_page(players);
+  const team_name = team_with_players.data.data.name;
+  return {
+    team_name: team_name,
+    players_info: player_info
+  };
   
 }
 
@@ -99,4 +92,4 @@ exports.get_info = get_info;
 exports.info_include_param = info_include_param;
 exports.get_favorites_info = get_favorites_info;
 exports.get_teams_matches = get_teams_matches;
-exports.get_players_info_for_team_page = get_players_info_for_team_page;
+exports.get_player_and_team_info = get_player_and_team_info;

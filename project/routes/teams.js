@@ -21,12 +21,12 @@ router.get("/:team_name/matches", async (req, res, next) => {
   });
 
 
-router.get("/get_page_details/:team__id", async (req, res, next) => {
+router.get("/get_page_details/:team_id", async (req, res, next) => {
   try {
-    const players_info = await teams_utils.get_players_info_for_team_page(
-      req.params.team__id
+    const players_info = await teams_utils.get_player_and_team_info(
+      req.params.team_id
     );
-    const matches_query = `SELECT * from dbo.matches`;
+    const matches_query = `SELECT * from dbo.matches WHERE home_team=${team}`;
     const matches_info = teams_utils.get_teams_matches(matches_query);
     const full_team_details ={
       match_details: matches_info,
