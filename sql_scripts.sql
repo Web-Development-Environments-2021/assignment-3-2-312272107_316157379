@@ -138,3 +138,7 @@
 
 -- SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1); 
 
+    -- SELECT TOP 1 *
+    -- FROM dbo.matches
+    -- WHERE matches.match_date_time  >  GETDATE() 
+    -- ORDER BY match_date_time ASC

@@ -23,12 +23,10 @@ router.get("/:team_name/matches", async (req, res, next) => {
 
 router.get("/get_page_details/:team_id", async (req, res, next) => {
   try {
-    // const page_info = await teams_utils.get_player_and_team_info(
-    //   req.params.team_id
-    // );
-    
-    //${page_info.team_name}
-    const matches_query = `SELECT * from dbo.matches WHERE home_team = 'OB'  OR away_team= 'OB'`;
+    const page_info = await teams_utils.get_player_and_team_info(
+      req.params.team_id
+    );
+    const matches_query = `SELECT * from dbo.matches WHERE home_team = '${page_info.team_name}'  OR away_team= '${page_info.team_name}'`;
     const matches_info = await teams_utils.get_teams_matches(matches_query);
     const full_team_details ={
       match_details: matches_info,
@@ -41,8 +39,5 @@ router.get("/get_page_details/:team_id", async (req, res, next) => {
     next(error);
   }
 });
-
-module.exports = router;
-
 
 module.exports = router;

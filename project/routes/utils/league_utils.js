@@ -26,7 +26,7 @@ async function getLeagueDetails() {
     `
     SELECT TOP 1 *
     FROM dbo.matches
-    WHERE dbo.matches.match_date > (SELECT CAST( GETDATE() AS Date ))
+    WHERE matches.match_date_time  >  GETDATE() 
     ORDER BY dbo.matches.match_date ASC
     `
   )
