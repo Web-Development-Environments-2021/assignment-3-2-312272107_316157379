@@ -34,16 +34,11 @@ router.post("/matches", async (req, res, next) => {
       away_team_name,
       LEAGUE_ID
     );
-    const teams_plays_today=await DButils.execQuery(
-      `
-      SELECT match_id from matches WHERE 
-      ((home_team = '${home_team_name}' or away_team= '${home_team_name}') or (home_team = '${away_team_name}' or away_team= '${away_team_name}'))  and
-      CAST(matches.match_date_time As date) = CAST('${date_time}' As date)      
-        `
-    );
-    if (teams_plays_today.length != 0){
-      throw { status: 400, message: "can't add match" };
-    }
+    
+
+    // checks if matches with the teams happend at the same day and that there are referees available.   
+    const referee_id = union_rep_utils.check_add_match_depenedecies(home_team_name,away_team_name,date_time);
+
     const venue = await axios.get(
       `${api_domain}/venues/${home_team[0].venue_id}`,
       {
@@ -52,18 +47,8 @@ router.post("/matches", async (req, res, next) => {
         },
       }
     );
-    const free_referees = await DButils.execQuery(
-      `
-      SELECT user_id  FROM user_roles WHERE user_role = 'referee' AND user_id not in 
-      (SELECT referee_id from matches WHERE
-      CAST(matches.match_date_time As date) = CAST('${date_time}' As date))
-      `
-    );
-    if (free_referees.length==0){
-      throw { status: 400, message: "can't add match" };
-    }
 
-    const referee_id = free_referees[0].user_id//need to change
+
     const match_id = await DButils.execQuery(
       `
         INSERT INTO dbo.matches(match_date_time,home_team,away_team,venue,referee_id,is_over)
@@ -71,10 +56,9 @@ router.post("/matches", async (req, res, next) => {
         VALUES (convert(varchar,'${date_time}', 20),'${home_team_name}','${away_team_name}','${venue.data.data.name}',${referee_id},0);
         `
     );
-
-    const match_creation_message = "match created succesfully";
+    
     res.status(201);
-    logStream.end(match_creation_message);
+    logStream.end("match created succesfully");
   } catch (error) {
     // logStream.end(error.message); TODO need to return to this later
     next(error);
