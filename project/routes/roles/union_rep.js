@@ -34,7 +34,16 @@ router.post("/matches", async (req, res, next) => {
       away_team_name,
       LEAGUE_ID
     );
-
+    const teams_plays_today=await DButils.execQuery(
+      `
+      SELECT match_id from matches WHERE 
+      ((home_team = '${home_team_name}' or away_team= '${home_team_name}') or (home_team = '${away_team_name}' or away_team= '${away_team_name}'))  and
+      CAST(matches.match_date_time As date) = CAST('${date_time}' As date)      
+        `
+    );
+    if (teams_plays_today.length != 0){
+      throw { status: 400, message: "can't add match" };
+    }
     const venue = await axios.get(
       `${api_domain}/venues/${home_team[0].venue_id}`,
       {
@@ -43,8 +52,18 @@ router.post("/matches", async (req, res, next) => {
         },
       }
     );
+    const free_referees = await DButils.execQuery(
+      `
+      SELECT user_id  FROM user_roles WHERE user_role = 'referee' AND user_id not in 
+      (SELECT referee_id from matches WHERE
+      CAST(matches.match_date_time As date) = CAST('${date_time}' As date))
+      `
+    );
+    if (free_referees.length==0){
+      throw { status: 400, message: "can't add match" };
+    }
 
-    const referee_id = 1//need to change
+    const referee_id = free_referees[0].user_id//need to change
     const match_id = await DButils.execQuery(
       `
         INSERT INTO dbo.matches(match_date_time,home_team,away_team,venue,referee_id,is_over)
@@ -54,7 +73,7 @@ router.post("/matches", async (req, res, next) => {
     );
 
     const match_creation_message = "match created succesfully";
-    res.status(201).send(match_id);
+    res.status(201);
     logStream.end(match_creation_message);
   } catch (error) {
     // logStream.end(error.message); TODO need to return to this later

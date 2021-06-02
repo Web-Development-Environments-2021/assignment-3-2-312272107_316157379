@@ -107,3 +107,11 @@
 -- 
 -- UPDATE user_roles set user_role='union_representative' where user_id=8;
 -- select * from dbo.user_roles where user_id=8 AND user_role='union_rep'; 
+-- INSERT INTO dbo.user_roles(user_id,user_role)  VALUES(8,'referee')
+
+-- SELECT user_id  FROM user_roles WHERE user_role = 'referee' AND user_id not in 
+-- (SELECT referee_id from matches WHERE
+--  CAST(matches.match_date_time As date) = CAST('2012-12-22 03:59:12' As date))
+SELECT match_id from matches WHERE 
+((home_team = 'OB' or away_team= 'ob') or (home_team = 'AGF' or away_team= 'AGF'))  and
+CAST(matches.match_date_time As date) = CAST('2012-12-22 03:59:12.000' As date)
