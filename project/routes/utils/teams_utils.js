@@ -28,8 +28,12 @@ function extract_relevant_data(teams_info) {
 
 function filter_by_league(teams_objects, league_id) {
   let teams_in_league = [];
-  teams_objects.data.data.map( (team_leagues) => {
-    if (team_leagues.league.data.id == league_id) {
+  let teams = teams_objects.data.data;
+  if (typeof teams !== Array){
+    teams = [teams_objects];
+  }
+  teams.map( (team_leagues) => {
+    if (team_leagues.data.data.league.data.id == league_id) {
       teams_in_league.push(team_leagues);
     }
   });
@@ -64,18 +68,18 @@ async function get_player_and_team_info(team_id,league_id=271) {
   });
   team_with_players = filter_by_league(team_with_players,league_id);
 
-  team_with_players.data.data.squad.data.map((player) =>
+  team_with_players[0].data.data.squad.data.map((player) =>
   player_ids.push(player.player_id));
 
-  const tmp_include_param = info_include_param;
-  info_include_param = ''; // not taking any additional information atm
+  const tmp_include_param = players_utils.info_include_param;
+  players_utils.info_include_param = ''; // not taking any additional information atm
   
   const players = await users_utils.get_object_by_id(player_ids,'players');
 
-  info_include_param = tmp_include_param;
+  players_utils.info_include_param = tmp_include_param;
 
   const player_info = players_utils.extract_relevant_information_for_team_page(players);
-  const team_name = team_with_players.data.data.name;
+  const team_name = team_with_players[0].data.data.name;
   return {
     team_name: team_name,
     players_info: player_info

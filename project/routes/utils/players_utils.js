@@ -1,6 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
-const info_include_param = `team,stats,position`;
+let info_include_param = `team,stats,position`;
 
 
 function get_info(players_objects, league_id) {
@@ -54,7 +54,7 @@ async function get_favorites_info(players_ids, category, league_id) {
 }
 
 function extract_relevant_information_for_team_page(players){
-    return players.map(player => player.name);
+    return players.map(player => player.data.data.fullname);
 }
 
 
