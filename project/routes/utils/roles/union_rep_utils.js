@@ -36,20 +36,22 @@ async function check_add_match_depenedecies(home_team_name,away_team_name,date_t
   if (free_referees.length==0 || teams_plays_today.length != 0 ){
     throw { status: 400, message: "can't add match" };
   }
-  
+
   return free_referees[0].user_id;
 
 
 }
 
 const event_types = {
-  goal: "Goal",
+  home_goal: "Home-Goal",
+  Away_goal: "Away-Goal",
   offside: "Offside",
   foul: "Foul",
   redcard: "Red-Card",
   yellowcard: "Yellow-Card",
   injury: "Injury",
   sub: "Substitution",
+  end_match:"End-match",
   other: "Other",
 };
 
