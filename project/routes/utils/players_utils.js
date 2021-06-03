@@ -12,8 +12,8 @@ function extract_relevant_search_data(players_info) {
   return players_info.map((player_info) => {
     const { player_id,common_name,nationality,birthdate,birthcountry,height,weight, fullname, image_path } =
       player_info;
-    const { team_name } = player_info.team.data;
-    const { position } = player_info.position.data.name;
+    const team_name = player_info.team.data;
+    const player_position = player_info.position.data.name;
 
     return {
       id: player_id,
@@ -25,7 +25,7 @@ function extract_relevant_search_data(players_info) {
       height: height,
       weight: weight,  
       image: image_path,
-      position: position,
+      position: player_position,
       team_name: team_name,
     };
   });

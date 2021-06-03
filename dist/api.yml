@@ -10,6 +10,7 @@ paths:
     post:
       tags: 
         - authentication
+        - tested
       summary: register 
       description: register new user to system
       requestBody:
@@ -29,6 +30,7 @@ paths:
     post:
       tags: 
         - authentication
+        - tested
       summary: user log in
       requestBody:
         required: true
@@ -55,19 +57,26 @@ paths:
     get:
       tags: 
         - league
+        - tested
       summary: get_league_details 
-      description: fetch "cycle" and next match in Super Liga.
+      description: retrieves the league's name, stage name, season and next match details.
       responses:
         "200":
-          description: "returned league details"
+          description: league's details successfully retrieved
         "404":
-          description: "couldn't supply league's details, league not found"
-  /matches:
+          description: could not find league with league id {league_id}
+  /matches/{stage_id}:
     get:
       tags: 
         - matches
-      summary: get_matches_in_cycle 
-      description: get all matches in "cycle";
+      summary: get matches in stage 
+      description: games in current stage page 
+      parameters: 
+      - in: "path"
+        name: stage_id
+        required: true
+        schema:
+          type: integer
       responses:
         "200":
           description: "successfully retrieved matches"
@@ -91,17 +100,6 @@ paths:
         "400":
           description: couldnt retrieve team's details
           
-  # /league/matches:
-  #   get:
-  #     tags: 
-  #       - league
-  #     summary: get_matches_in_league
-  #     description: get all matches in SuperLiga. 
-  #     responses:
-  #       "200":
-  #         description: "returned matches that match team id"
-  #       "404":
-  #         description: "couldn't supply league's details, league not found"
   # /matches/{match_id}:
   #   get:
   #     tags: 
@@ -354,13 +352,13 @@ components:
           example: '03:59:12'
         home_team_name:
           type: string
-          # required: true
           example: 'OB'
         away_team_name:
           type: string
-          # required: true
           example: 'AGF'
-        # court
+        stage_id:
+          type: integer
+          example: null
     new_game_event:
       type: object
       properties:

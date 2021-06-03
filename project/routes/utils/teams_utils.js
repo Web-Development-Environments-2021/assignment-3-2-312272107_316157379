@@ -5,11 +5,6 @@ const users_utils = require("./users_utils");
 const players_utils = require("./players_utils");
 const DButils = require("./DButils");
 
-// async function get_info(teams_ids) {
-//     let player_ids_list = await getPlayerIdsByTeam(team_id);
-//     let players_info = await get_players_info(player_ids_list);
-//     return players_info;
-//   }
 
 function get_info(teams_objects, league_id) {
   const teams_in_league = filter_by_league(teams_objects, league_id);
@@ -45,27 +40,38 @@ async function get_favorites_info(teams_ids, category, league_id) {
   return get_info(teams_objects, league_id);
 }
 
+
 async function get_teams_matches(matches_query) {
   const event_log_info_query = await DButils.execQuery(
     `SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game`
   );
   let matches_info = await DButils.execQuery(matches_query);
-
-
-  let event_logs_grouped_by_id = event_log_info_query.reduce(
-    (some_obj, match) => {
-
-      some_obj[match.match_id] = [...(some_obj[match.match_id] || []), match];
-      return some_obj;
-    },
-    {}
-  );
-  matches_info.map(
-    match => match.event_log = Object.values(event_logs_grouped_by_id).find(
-        event_log => match.match_id === event_log[0].match_id));
+  matches_info = add_event_log_to_matches_info(event_log_info_query,matches_info);
 
   return matches_info;
 }
+
+
+function  add_event_log_to_matches_info(event_log_info_query,matches_info){
+
+  // make an object of arrays, each array mapping match_id to event log (events)
+  let event_logs_grouped_by_id = event_log_info_query.reduce(
+    (match_id_to_event_log_acc, match) => {
+
+      match_id_to_event_log_acc[match.match_id] = [...(match_id_to_event_log_acc[match.match_id] || []), match];
+      return match_id_to_event_log_acc;
+    },
+    {}
+  );
+
+  // add each event log array to matches_info as additional property 
+  return matches_info.map(
+    match => match.event_log = Object.values(event_logs_grouped_by_id).find(
+        event_log => match.match_id === event_log[0].match_id)); 
+
+    
+}
+
 
 async function get_player_and_team_info(team_id, league_id = 271) {
   let player_ids = [];

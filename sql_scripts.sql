@@ -31,16 +31,18 @@
 -- 	[home_team] [varchar](50) NOT NULL,
 -- 	[away_team] [varchar](50) NOT NULL,
 -- 	[venue] [varchar](50) NOT NULL,
--- 	[score] [varchar](50) NULL,
+-- 	[home_team_goals] [int] NULL,
+-- 	[away_team_goals] [int] NULL,
 --  [referee_id] [int] NOT NULL,
 --  [is_over] [bit] NOT NULL,
 -- [stage] [varchar](30) NOT NULL,
+
 -- );
 
 -- CREATE TABLE dbo.matches_event_log(
 -- 	   match_id [int],
 --     event_date_time [datetime], 
---     minute_in_game [int], -- 13
+--     minute_in_game [int], 
 --     event_type [varchar](20), 
 --     description [varchar](200),
 -- 	FOREIGN KEY (match_id) REFERENCES dbo.matches(match_id),
@@ -82,11 +84,6 @@
 
 -- SELECt * FROM dbo.matches WHERE match_id IN ('[8,9].join(',')');
 
--- SELECT TOP 1 *
--- FROM dbo.matches
--- WHERE dbo.matches.match_date > (SELECT CAST( GETDATE() AS Date ))
--- ORDER BY dbo.matches.match_date ASC
-
 
 --***************************************************
 
@@ -103,42 +100,14 @@
 -- DROP TABLE dbo.favorite_matches;
 -- DROP TABLE dbo.user_roles;
 -- Drop Table dbo.matches;
---***************************************************
--- 
--- UPDATE user_roles set user_role='union_representative' where user_id=8;
--- select * from dbo.user_roles where user_id=8 AND user_role='union_rep'; 
--- INSERT INTO dbo.user_roles(user_id,user_role)  VALUES(8,'referee')
+--*************************************************** 
 
--- SELECT user_id  FROM user_roles WHERE user_role = 'referee' AND user_id not in 
--- (SELECT referee_id from matches WHERE
---  CAST(matches.match_date_time As date) = CAST('2012-12-22 03:59:12' As date))
--- SELECT match_id from matches WHERE 
--- ((home_team = 'OB' or away_team= 'ob') or (home_team = 'AGF' or away_team= 'AGF'))  and
--- CAST(matches.match_date_time As date) = CAST('2012-12-22 03:59:12.000' As date)
+-- select *  from users
 
-
--- SELECT * from dbo.matches WHERE home_team = 'OB' or away_team= 'OB';
-
--- SELECT * FROM dbo.matches_event_log WHERE match_id=(SELECT match_id FROM dbo.matches WHERE is_over=1);
-
--- SELECT matches.*,eventLogs.* 
--- FROM 
--- (SELECT * from dbo.matches WHERE home_team = 'OB' or away_team= 'OB') AS matches
--- LEFT JOIN
--- (SELECT * FROM dbo.matches_event_log WHERE match_id=(SELECT match_id FROM dbo.matches WHERE is_over=1)) AS eventLogs 
--- ON (matches.match_id=eventLogs.match_id);
-
-
-
--- UPDATE matches SET is_over=1 WHERE match_id=2;
--- insert into matches_event_log values(2,'2024-11-18 03:59:12',15,'Goal','Aviachai scored the goal again');
+-- select *  from users
 -- select * from matches
--- select * from matches_event_log
+    
+-- select * from matches where 1=1;
+-- drop table matches
 
-
--- SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1); 
-
-    -- SELECT TOP 1 *
-    -- FROM dbo.matches
-    -- WHERE matches.match_date_time  >  GETDATE() 
-    -- ORDER BY match_date_time ASC
+select * from dbo.matches

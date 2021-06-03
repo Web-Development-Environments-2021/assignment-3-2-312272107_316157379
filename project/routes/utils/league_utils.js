@@ -2,40 +2,56 @@ const axios = require("axios");
 const DButils = require("./DButils");
 const LEAGUE_ID = 271; // SuperLiga
 // const season_id = 17328; // SuperLiga
+const api_domain = "https://soccer.sportmonks.com/api/v2.0";
+const matches_utils = require("./matches_utils");
+
+async function get_league_by_id(league_id) {
+  let league = await axios.get(`${api_domain}/leagues/${LEAGUE_ID}`, {
+    params: {
+      include: "season",
+      api_token: process.env.api_token,
+    },
+  });
+  if (!league) {
+    throw {
+      status: 404,
+      message: `could not find league with league id ${league_id}`,
+    };
+  }
+  league = league.data.data;
+  return league;
+}
+
+async function get_stage_by_id(stage_id) {
+  let stage = null;
+  if (stage_id) {
+    stage = await axios.get(
+      `${api_domain}/stages/${stage_id}`,
+      {
+        params: {
+          api_token: process.env.api_token,
+        },
+      }
+    );
+  return stage;
+  }
+}
 
 async function getLeagueDetails() {
-  const league = await axios.get(
-    `https://soccer.sportmonks.com/api/v2.0/leagues/${LEAGUE_ID}`,
-    {
-      params: {
-        include: "season",
-        api_token: process.env.api_token,
-      },
-    }
-  );
-  const stage = await axios.get(
-    `https://soccer.sportmonks.com/api/v2.0/stages/${league.data.data.current_stage_id}`,
-    {
-      params: {
-        api_token: process.env.api_token,
-      },
-    }
-  );
-  const next_match = await DButils.execQuery // TODO doesn't reference any league or season
-  (
-    `
-    SELECT TOP 1 *
-    FROM dbo.matches
-    WHERE matches.match_date_time  >  GETDATE() 
-    ORDER BY dbo.matches.match_date ASC
-    `
-  )
-
+  const league = await get_league_by_id(LEAGUE_ID);
+  const stage = await get_stage_by_id(league.stage_id);
+  let stage_name = null;
+  if (stage) {
+    stage_name = stage.data.data.name;
+  }
+  const next_match = matches_utils.get_next_match_in_league();
   return {
-    league_name: league.data.data.name,
-    current_season_name: league.data.data.season.data.name,
-    current_stage_name: stage.data.data.name,
-    next_match_details: next_match
+    league_name: league.name,
+    current_season_name: league.season.data.name,
+    current_stage_name: stage_name,
+    next_match_details: next_match,
   };
 }
+
 exports.getLeagueDetails = getLeagueDetails;
+exports.get_stage_by_id = get_stage_by_id;

@@ -13,7 +13,7 @@ router.post("/register", async (req, res, next) => {
       req.body;
 
     // username exists
-    await DButils.execQuery(
+      await DButils.execQuery(
       `SELECT * FROM dbo.users WHERE username='${username}'`
     ).then((q_user_name) => {
       if (q_user_name.length > 0) {
@@ -26,7 +26,7 @@ router.post("/register", async (req, res, next) => {
 
     //hash the password
     let hash_password = bcrypt.hashSync(
-      password,
+      req.body.password,
       parseInt(process.env.bcrypt_saltRounds)
     );
     req.body.password = hash_password;
@@ -56,10 +56,10 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    const user = await DButils.execQuery(
-      `SELECT * FROM dbo.users WHERE username = '${req.body.username}'`
-    )[0]; // user = user[0];
-
+    let user = await DButils.execQuery(
+      `SELECT * FROM users WHERE username = '${req.body.username}'`
+    ); // user = user[0];
+    user=user[0];
     // check that username exists & the password is correct
     if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
       throw { status: 401, message: "Invalid username/password" };
@@ -68,10 +68,10 @@ router.post("/login", async (req, res, next) => {
     // Set cookie
     req.session.user_id = user.user_id;
     let user_roles = await DButils.execQuery(
-      `SELECT role FROM dbo.user_roles WHERE user_id = ${user.user_id}`
+      `SELECT user_role FROM dbo.user_roles WHERE user_id = ${user.user_id}`
     );
 
-    user_login_message = `user '${req.body.username}' successful logged in\n`;
+    user_login_message = `user '${req.body.username}' successful logged in`;
     res.status(200).send({
       message: user_login_message,
       roles: user_roles,
