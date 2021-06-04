@@ -175,3 +175,4 @@ exports.verify_active_match = verify_active_match;
 exports.insert_new_event = insert_new_event;
 exports.insert_new_match = insert_new_match;
 exports.check_add_match_depenedecies = check_add_match_depenedecies;
+exports.get_next_match_in_league = get_next_match_in_league;

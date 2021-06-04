@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
 const teams_utils = require("./utils/teams_utils");
-const LEAGUE_ID = 271;
 let fs = require("fs");
 let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 

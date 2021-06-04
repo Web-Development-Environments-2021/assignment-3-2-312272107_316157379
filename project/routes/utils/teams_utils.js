@@ -1,10 +1,10 @@
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const axios = require("axios");
 let info_include_param = "league";
+
 const users_utils = require("./users_utils");
 const players_utils = require("./players_utils");
 const DButils = require("./DButils");
-const { get } = require("../roles/union_rep");
 
 
 function get_info(teams_info) {

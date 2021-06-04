@@ -1,5 +1,3 @@
-const axios = require("axios");
-const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 let info_include_param = `team,stats,position`;
 
 
@@ -26,7 +24,7 @@ function get_info(players) {
   });
 }
 
-function filter_by_league(players_objects, league_id) {
+function filter_by_league(players_objects,LEAGUE_ID) {
   let players_in_league = [];
   let players = players_objects.data.data;
   if (!(players instanceof Array)) {
@@ -44,17 +42,9 @@ function filter_by_league(players_objects, league_id) {
   return players_in_league;
 }
 
-async function get_favorites_info(players_ids, category, league_id) {
 
-  return get_info(players_objects, league_id);
-}
-
-
-
-// function extract_relevant_information_for_team_page(players){
-//     return players.map(player => player.data.data.fullname);
-// }
 
 
 exports.get_info = get_info;
 exports.info_include_param = info_include_param;
+exports.filter_by_league = filter_by_league;
