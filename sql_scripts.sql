@@ -27,17 +27,18 @@
 
 -- CREATE TABLE [dbo].[matches](
 -- 	[match_id] [int] PRIMARY KEY IDENTITY(1,1),    
---  [match_date_time] [datetime] NOT NULL,
+--     [match_date_time] [datetime] NOT NULL,
 -- 	[home_team] [varchar](50) NOT NULL,
 -- 	[away_team] [varchar](50) NOT NULL,
 -- 	[venue] [varchar](50) NOT NULL,
 -- 	[home_team_goals] [int] NULL,
 -- 	[away_team_goals] [int] NULL,
---  [referee_id] [int] NOT NULL,
---  [is_over] [bit] NOT NULL,
--- [stage] [varchar](30) NOT NULL,
+--     [referee_id] [int] NOT NULL,
+--     [is_over] [bit] NOT NULL,
+--     [stage] [varchar](30) NULL,
 
 -- );
+
 
 -- CREATE TABLE dbo.matches_event_log(
 -- 	   match_id [int],
@@ -102,12 +103,12 @@
 -- Drop Table dbo.matches;
 --*************************************************** 
 
--- select *  from users
-
--- select *  from users
--- select * from matches
+-- update matches SET is_over=0 WHERE match_id=7;
+-- select * from matches 
+-- delete from matches_event_log
     
--- select * from matches where 1=1;
--- drop table matches
 
--- insert into user_roles values(12,'union_representative');
+
+
+
+

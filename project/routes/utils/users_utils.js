@@ -57,7 +57,19 @@ async function get_object_by_id(ids,category_name) {
 }
 
  
+async function validate_role(user_id,role){
+  const users = await DButils.execQuery(
+      `SELECT * FROM dbo.user_roles WHERE user_id='${user_id}' AND user_role = '${role}'`
+    );
+    if (users.length == 0) {
+      throw { status: 400, message: `user doesn't have permission of ${role}` };
+    }
+}
 
+
+
+
+exports.validate_role = validate_role;
 exports.role_to_role_name = role_to_role_name;
 exports.favorite_categories = favorite_categories;
 exports.verify_category = verify_category;
