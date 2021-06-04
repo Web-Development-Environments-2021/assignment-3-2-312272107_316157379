@@ -6,11 +6,8 @@ const players_utils = require("./players_utils");
 const DButils = require("./DButils");
 const { get } = require("../roles/union_rep");
 
-function get_info(teams_objects, league_id) {
-  const teams_in_league = filter_by_league(teams_objects, league_id);
-  return extract_relevant_data(teams_in_league);
-}
-function extract_relevant_data(teams_info) {
+
+function get_info(teams_info) {
   return teams_info.map((team_info) => {
     const { id, name, logo_path, venue_id } = team_info;
     return {
@@ -38,10 +35,7 @@ function filter_by_league(teams_objects, league_id) {
   });
   return teams_in_league;
 }
-async function get_favorites_info(teams_ids, category, league_id) {
-  const teams_objects = await users_utils.get_object_by_id(teams_ids, category);
-  return get_info(teams_objects, league_id);
-}
+
 
 async function get_teams_matches(matches_query) {
   const event_log_info_query = await DButils.execQuery(
@@ -86,22 +80,17 @@ async function get_player_and_team_info(team_id, league_id = 271) {
       api_token: process.env.api_token,
     },
   });
+  const team_name = team_with_players[0].data.data.name;
+
   team_with_players = filter_by_league(team_with_players, league_id);
 
   team_with_players[0].data.data.squad.data.map((player) =>
     player_ids.push(player.player_id)
   );
 
-  const tmp_include_param = players_utils.info_include_param;
-  players_utils.info_include_param = ""; // not taking any additional information atm
-
   const players = await users_utils.get_object_by_id(player_ids, "players");
-
-  players_utils.info_include_param = tmp_include_param;
-
-  const player_info =
-    players_utils.extract_relevant_information_for_team_page(players);
-  const team_name = team_with_players[0].data.data.name;
+  const player_info = players_utils.extract_relevant_data(players);
+  
   return {
     team_name: team_name,
     players_info: player_info,

@@ -13,11 +13,15 @@ const event_types = {
   other: "Other",
 };
 
-async function get_favorites_info(matches_ids, category, league_id) {
-  const favorites_ids_as_string = matches_ids.join();
+function filter_by_league(matches, league_id) {
+  return matches;
+}
+
+async function get_info(matches_ids, category, league_id) {
+  const matches_ids_as_string = matches_ids.join();
   const favorites = await DButils.execQuery(
     `SELECT * FROM dbo.matches WHERE match_id IN 
-      (${favorites_ids_as_string})`
+      (${matches_ids_as_string})`
   );
   return favorites;
 }
@@ -34,17 +38,20 @@ async function get_next_match_in_league() {
   return next_match;
 }
 async function verify_active_match(match_id) {
-  await DButils.execQuery(
-    `SELECT match_id FROM dbo.matches WHERE is_over=0 AND match_id=${match_id}`
-  ).then((active_match) => {
+  try{
+    const active_match = await DButils.execQuery(
+      `SELECT match_id FROM dbo.matches WHERE is_over=0 AND match_id=${match_id}`
+    );
     if (active_match.length == 0) {
+      throw
+    }
+  }catch{
       throw {
         status: 400,
         message:
-          "can't add event to match since it was over or does not existed",
+          "can't add event to match since it was over or does not exist or due to bad input",
       };
-    }
-  });
+  }
 }
 
 async function insert_new_event(
@@ -76,19 +83,27 @@ async function insert_new_event(
     default:
       break;
   }
+  try{
+    await DButils.execQuery(
+      `
+          INSERT INTO dbo.matches_event_log(match_id,event_date_time,minute_in_game,event_type,description)
+          VALUES (${match_id}, GETDATE(),${minute_in_game},'${event_type_name}','${event_description}');
+          `
+    );
+    await DButils.execQuery(
+      `
+      UPDATE matches SET
+      is_over=${is_over},home_team_goals = home_team_goals+${home_scores} ,away_team_goals = away_team_goals+${away_scores}
+          `
+    );
+  }
+  catch{
+    throw{
+      status:400,
+      message: 'Something went wrong when inserting new event to event log '
+    }
+  }
 
-  await DButils.execQuery(
-    `
-        INSERT INTO dbo.matches_event_log(match_id,event_date_time,minute_in_game,event_type,description)
-        VALUES (${match_id}, GETDATE(),${minute_in_game},'${event_type_name}','${event_description}');
-        `
-  );
-  await DButils.execQuery(
-    `
-    UPDATE matches SET
-    is_over=${is_over},home_team_goals = home_team_goals+${home_scores} ,away_team_goals = away_team_goals+${away_scores}
-        `
-  );
   return event_type_name;
 }
 
@@ -97,40 +112,42 @@ async function check_add_match_depenedecies(
   away_team_name,
   date_time
 ) {
-  const teams_plays_today = await DButils.execQuery(
-    `
-    DECLARE @date_time_as_date AS DATE
-    SET @date_time_as_date = '${date_time}'
-
-    SELECT match_id from matches WHERE 
-    ((home_team = '${home_team_name}' or away_team= '${home_team_name}') OR (home_team = '${away_team_name}' or away_team= '${away_team_name}')) AND
-
-    ( datediff(day, @date_time_as_date, CAST(match_date_time AS DATE) ) == 0)     
+  try{
+    const teams_plays_today = await DButils.execQuery(
       `
-  );
-  const free_referees = await DButils.execQuery(
-    `
-    DECLARE @date_time_as_date AS DATE
-    SET @date_time_as_date = '${date_time}'
-
-    SELECT user_id  FROM user_roles WHERE user_role = '${users_utils.role_to_role_name.REFEREE}' AND user_id NOT IN
-    ( 
-      SELECT referee_id from matches WHERE
-      (
-         datediff(day,@date_time_as_date, CAST(match_date_time AS DATE)) !=0
+      DECLARE @date_time_as_date AS DATE
+      SET @date_time_as_date = '${date_time}'
+  
+      SELECT match_id from matches WHERE 
+      ((home_team = '${home_team_name}' or away_team= '${home_team_name}') OR (home_team = '${away_team_name}' or away_team= '${away_team_name}')) AND
+  
+      ( datediff(day, @date_time_as_date, CAST(match_date_time AS DATE) ) == 0)     
+        `
+    );
+    const free_referees = await DButils.execQuery(
+      `
+      DECLARE @date_time_as_date AS DATE
+      SET @date_time_as_date = '${date_time}'
+  
+      SELECT user_id  FROM user_roles WHERE user_role = '${users_utils.role_to_role_name.REFEREE}' AND user_id NOT IN
+      ( 
+        SELECT referee_id from matches WHERE
+        (
+           datediff(day,@date_time_as_date, CAST(match_date_time AS DATE)) !=0
+        )
       )
-    )
-    `
-  );
-
-  if (free_referees.length == 0 || teams_plays_today.length != 0) {
+      `
+    );
+    if (free_referees.length == 0 || teams_plays_today.length != 0) {
+      throw
+    }
+    return free_referees[0].user_id;
+  }catch{
     throw {
       status: 400,
-      message: "can't add match due to unmatching depenedencies",
+      message: "can't add match due to unmatching depenedencies or bad input",
     };
   }
-
-  return free_referees[0].user_id;
 }
 
 async function insert_new_match(date_time,home_team_name,away_team_name,venue_name,referee_id,stage_id) {
@@ -152,7 +169,7 @@ async function insert_new_match(date_time,home_team_name,away_team_name,venue_na
 }
 
 exports.event_types = event_types;
-exports.get_favorites_info = get_favorites_info;
+exports.get_favorites_info = get_info;
 exports.info_include_param = info_include_param;
 exports.verify_active_match = verify_active_match;
 exports.insert_new_event = insert_new_event;

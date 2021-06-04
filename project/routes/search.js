@@ -6,13 +6,13 @@ const fs = require("fs");
 const logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
 const search_utils = require('./utils/search_utils');
+const LEAGUE_ID = 271; // SUPERLIGA
 
 
 
 // league_id should arrive as query_param
 router.get("/:category_name/:name_query", async (req, res, next) => {
   try {
-    const LEAGUE_ID = 271; // SUPERLIGA
     const category_name = req.params.category_name;
     await users_utils.verify_category(category_name, search_categories);
 
@@ -20,11 +20,12 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
 
     // supports either only first name or last name or full name, but has to be a valid.
     // returns object based on category name and name query
-    let search_results_raw_objects = await search_utils.search_by_category_and_query(category_name,req.params.name_query);
+    let search_results = await search_utils.search_by_category_and_query(category_name,req.params.name_query);
     
     const utils_by_category = await users_utils.get_utils_by_category(category_name);
 
-    const search_results_information = utils_by_category.get_info(search_results_raw_objects,LEAGUE_ID);
+    search_results = utils_by_category.filter_by_league(search_results,LEAGUE_ID);
+    const search_results_info = utils_by_category.get_info(search_results);
 
     // users have their last search saved
     if (req.session.user_id) {
@@ -32,7 +33,7 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
         `UPDATE dbo.users SET last_search=${name_query} WHERE user_id=${user_id}`
         );
     }
-    res.status(200).send(search_results_information);
+    res.status(200).send(search_results_info);
     logStream.end(`search for ${req.params.name_query} was successful`);
   } catch (error) {
     logStream.end(error.message); 

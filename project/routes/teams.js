@@ -9,7 +9,6 @@ let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 router.get("/:team_name/matches", async (req, res, next) => {
     try {
         const team_name = req.params.team_name;
-        // AND current_rotation=${rotation_input}
         const matches_query = `SELECT * FROM dbo.matches WHERE (home_team='${team_name}') OR (away_team='${team_name}')`;
         const matches_full_info = teams_utils.get_teams_matches(matches_query);
         res.status(200).send(matches_full_info);
