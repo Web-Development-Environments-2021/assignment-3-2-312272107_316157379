@@ -11,9 +11,10 @@ async function get_info(teams,caller){
     let teams_as_objects;
     if(caller == 'favorites'){
        teams_as_objects = await users_utils.get_object_by_id(teams,'team');
+       teams_as_objects = teams_as_objects.map((team) => team.data.data);
     }
     else{ // favorites already as objects
-      teams_as_objects = teams;
+      teams_as_objects = teams.data.data;
     }
     const teams_in_league = filter_by_league(teams_as_objects,LEAGUE_ID);
     const teams_info = extract_relevant_data(teams_in_league);
@@ -34,9 +35,8 @@ function extract_relevant_data(teams) {
   return teams_info
 }
 
-function filter_by_league(teams_objects, league_id) {
+function filter_by_league(teams, league_id) {
   let teams_in_league = [];
-  let teams = teams_objects.data.data;
   if (!(teams instanceof Array)) {
     teams = [teams_objects];
   }
