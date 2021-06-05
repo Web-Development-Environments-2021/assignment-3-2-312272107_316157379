@@ -175,10 +175,10 @@ async function insert_new_match(
 async function get_matches_by_query(matches_query) {
   try{
     const event_log_info_query = await DButils.execQuery(
-      `SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game`
+      'SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game'
     );
     let matches_info = await DButils.execQuery(matches_query);
-    if (event_log_info_query.length != 0){
+    if (matches_info != 0 && event_log_info_query.length != 0 ){
       matches_info = add_event_logs_to_past_matches(
         event_log_info_query,
         matches_info
@@ -188,7 +188,7 @@ async function get_matches_by_query(matches_query) {
   } catch{
     throw{
       status:400,
-      message: 'Something went wrong when trying to retrieve matches'
+      message: 'Something went wrong when trying to retrieve matches by query'
     }
   }
 

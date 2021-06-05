@@ -52,28 +52,39 @@ function filter_by_league(teams_objects, league_id) {
 }
 
 async function get_player_and_team_info(team_id, league_id = 271) {
-  let player_ids = [];
-  let team_with_players = await axios.get(`${api_domain}/teams/${team_id}`, {
-    params: {
-      include: "squad,league",
-      api_token: process.env.api_token,
-    },
-  });
-  const team_name = team_with_players[0].data.data.name;
-  
-  team_with_players = filter_by_league(team_with_players, league_id);
-  
-  team_with_players[0].data.data.squad.data.map((player) =>
-  player_ids.push(player.player_id)
-  );
-  
-  const players = await users_utils.get_object_by_id(player_ids, "players");
-  const player_info = players_utils.extract_relevant_data(players);
-  
-  return {
-    team_name: team_name,
-    players_info: player_info,
-  };
+  try{
+    // let player_ids = [];
+    let team_with_players = await axios.get(`${api_domain}/teams/${team_id}`, {
+      params: {
+        include: "squad.player,league",
+        api_token: process.env.api_token,
+      },
+    });
+    team_with_players = filter_by_league(team_with_players, league_id);
+    team_with_players = team_with_players[0];
+    const team_name = team_with_players.name; 
+    const players_info = team_with_players.squad.data.map(player => players_utils.get_basic_info(player.player.data));
+    
+
+    // team_with_players[0].data.data.squad.data.map((player) =>
+    // player_ids.push(player.player_id)
+    // );
+    // const players = await users_utils.get_object_by_id(player_ids, "players");
+    // const player_info = players_utils.extract_relevant_data(players);
+    // const team_name = team_with_players[0].data.data.name;
+    
+    return {
+      team_name: team_name,
+      players: players_info,
+    };
+  }
+  catch{
+    throw{
+      status: 400,
+      message: "Something went wrong when trying to retrieve team or players' details"
+    }
+  }
+
 }
 
 async function get_team_in_league(team_name, league_id = LEAGUE_ID) {

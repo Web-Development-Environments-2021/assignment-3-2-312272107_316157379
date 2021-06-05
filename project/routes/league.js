@@ -21,7 +21,7 @@ router.get("/:league_id/matches", async (req, res, next) => {
     const matches_query = 'SELECT * FROM dbo.matches'; // currently not supporting leagues other than SuperLiga
     const matches_in_league = await matches_utils.get_matches_by_query(matches_query);
     res.status(200).send(matches_in_league);
-    logStream.end("matches' successfully retrieved");
+    logStream.end("league matches successfully retrieved");
   } catch (error) {
     logStream.end(error.message); 
     next(error);
