@@ -11,7 +11,7 @@ router.post("/register", async (req, res, next) => {
 
     await auth_utils.validate_username_unique(username);
 
-    let hash_password = bcrypt.hashSync(
+    const hash_password = bcrypt.hashSync(
       req.body.password,
       parseInt(process.env.bcrypt_saltRounds)
     );
@@ -59,10 +59,12 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.post("/logout", function (req, res) {
+router.get("/logout", function (req, res) {
+  const user_id = req.session.user_id;
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-  res.status(200);
-  logStream.end(`user ${req.session.user_id} logged out`);
+  const success_message = 'user succesfully logged out'; 
+  res.status(200).send(success_message);
+  logStream.end(`user ${user_id} succesfully logged out`);
 });
 
 module.exports = router;

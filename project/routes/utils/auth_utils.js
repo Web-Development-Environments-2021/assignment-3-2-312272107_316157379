@@ -1,9 +1,5 @@
-var express = require("express");
-var router = express.Router();
 const DButils = require("./DButils");
 const bcrypt = require("bcryptjs");
-const fs = require("fs");
-const logStream = fs.createWriteStream("log.txt", { flags: "a" });
  
 
 async function validate_username_unique(username){
@@ -22,9 +18,9 @@ async function validate_username_unique(username){
 async function insert_new_user(username,hash_password,first_name,last_name,email,profile_pic){
   try{
     await DButils.execQuery(
-      `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic,last_search) 
+      `INSERT INTO dbo.users (username, password,first_name,last_name,email,profile_pic) 
        OUTPUT inserted.user_id 
-      VALUES ('${username}', '${hash_password}','${first_name}','${last_name}','${email}','${profile_pic}','')`
+      VALUES ('${username}', '${hash_password}','${first_name}','${last_name}','${email}','${profile_pic}')`
     );
   }
   catch{
@@ -65,7 +61,6 @@ async function get_roles_by_id(user_id){
     };
   }
 }
-
 
 exports.validate_username_unique = validate_username_unique;
 exports.insert_new_user=insert_new_user;

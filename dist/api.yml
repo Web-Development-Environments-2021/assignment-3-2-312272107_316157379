@@ -24,7 +24,7 @@ paths:
         '409':  
           description: "user could not be added, name taken."
         '400':
-          description: "username or password weren't sent."
+          description: "Something went wrong when trying to insert new user to system"
   /login:  
     post:
       tags: 
@@ -39,8 +39,21 @@ paths:
       responses:
         "200":
           description: "user {user_name} successfully logged in"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roles:
+                    type: array
+                    items:
+                      type: object
+                      description: different roles of user that logged in
+                      example: {user_role: referee}
         "401":
           description: "Invalid username/password"
+        "404":
+          description: "Something went wrong when trying to get roles of user"
   /logout:  
     get:
       tags: 
@@ -48,9 +61,7 @@ paths:
       summary: user logout
       responses:
         "200":
-          description: "user successfully logged out"
-        "400":
-          description: "failed to log out"
+          description: ""
   /league/details:
     get:
       tags: 
@@ -60,8 +71,36 @@ paths:
       responses:
         "200":
           description: league's details successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/league_details'
         "404":
           description: could not find league with league id {league_id}
+        "400":
+          description: Something went wrong when trying to get stage by id
+  /league/{league_id}/matches:
+    get:
+      tags: 
+        - league
+        - matches
+      summary: get_matches_in_league 
+      description: retrieves all the matches from the local DB (all curret) 
+      parameters: 
+      - in: "path"
+        name: league_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: league matches successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/matches_full_details_with_event_log'
+        "400":
+          description: Something went wrong when trying to search for matches
   /matches/{stage_id}:
     get:
       tags: 
@@ -74,14 +113,19 @@ paths:
         required: true
         schema:
           type: integer
-          example: null
+          example: 0
       responses:
         "200":
-          description: "successfully retrieved matches"
+          description: 'matches details in stage retrieved'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/matches_full_details_with_event_log'
         "400":
-          description: "couldn't retrieve matches"
+          description: Something went wrong when trying to retrieve matches
           
-  /team/get_page_details/{team_id}:
+          
+  /teams/get_page_details/{team_id}:
     get:
       tags: 
         - teams
@@ -95,25 +139,38 @@ paths:
       responses:
         "200":
           description: successfully retrieved team's details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  players_details:  
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/basic_player_details'
+                  match_details:  
+                    $ref: '#/components/schemas/matches_full_details_with_event_log'
+                    
         "400":
-          description: couldnt retrieve team's details
+          description: Something went wrong when trying to retrieve matches OR Something went wrong when trying to retrieve team or players' details
           
-  # /matches/{match_id}:
+  # /teams/{team_name}/matches:
   #   get:
   #     tags: 
-  #       - matches
-  #     summary: get_match_by_id 
+  #       - teams
+  #     summary: get_matches_by_team_name
+  #     description: get all matches team has played in or will play in. 
   #     parameters: 
   #     - in: "path"
-  #       name: match_id
+  #       name: team_name
   #       required: true
   #       schema:
-  #         type: integer
+  #         type: string
   #     responses:
   #       "200":
-  #         description: "returned match that matches id"
+  #         description: "returned matches that match team id"
   #       "404":
-  #         description: "invalid match id"
+  #         description: "invalid team id, could not find matches"
   
   /users/union_rep/matches:
     post:
@@ -131,7 +188,11 @@ paths:
         '201':
           description: "match successfully added"
         '400':
-          description: "match could not be added"
+          description: "can't add match due to unmatching depenedencies or bad input"
+        '404':
+          description: "couldn't find venue for match"
+        
+          
           
   /users/union_rep/matches/{match_id}/event_log:
     post:
@@ -223,23 +284,7 @@ paths:
         "404":
           description: "invalid name query, could not find players"
           
-  /teams/{team_name}/matches:
-    get:
-      tags: 
-        - teams
-      summary: get_matches_by_team_name
-      description: get all matches team has played in or will play in. 
-      parameters: 
-      - in: "path"
-        name: team_name
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: "returned matches that match team id"
-        "404":
-          description: "invalid team id, could not find matches"
+
   /users/favorites/{category_name}:
     get:
       tags: 
@@ -346,26 +391,20 @@ components:
     new_match:
       type: object
       properties:
-        date:
+        match_date_time:
           type: string
-          format: date
-          description: 'yyyy-mm-dd'
-          example: '2012-12-22'
-        hour:
-          type: string
-          description: hour-minutes in 4 digits format 
-          minLength: 5
-          maxLength: 5
-          example: '03:59:12'
+          format: date-time
+          description: 'yyyy-mm-dd hh:mm:ss'
+          example: '2012-12-22 03:59:12'
         home_team_name:
           type: string
           example: 'OB'
         away_team_name:
           type: string
           example: 'AGF'
-        stage_id:
-          type: integer
-          example: null
+        stage:
+          type: string
+          example: 'Knock Out'  
     new_game_event:
       type: object
       properties:
@@ -381,7 +420,86 @@ components:
         event_description:
           type: string
           example:  red card was given to messi for not being organized
-servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/t57268/Assignment_3.1_API/1.0.0
+    league_details:
+      type: object
+      properties:
+        league_name:
+          type: string
+          example: 'SuperLiga'
+        current_season_name:
+          type: string
+          example: '2020-2021'
+        current_stage_name:
+          type: string
+          example:  Conference League Play-offs - Final
+        next_match_details:
+          $ref: '#/components/schemas/match_full_details'
+    match_in_db_details:
+      type: object
+      properties:
+        match_id:
+          type: integer
+          example: 7
+        venue:
+          type: string
+          example: 'Nature Energy Park'
+        home_team_goals:
+          type: integer
+          example:  0
+        away_team_goals:
+          type: integer
+          example:  0
+        referee_id:
+          type: integer
+          description: referee assigned to the match
+          example:  12
+        is_over:
+          type: boolean
+          description: 0 if match is not over, 1 otherwise.
+          example: 0
+    match_full_details:
+      allOf:
+        - $ref: '#/components/schemas/new_match'
+        - $ref: '#/components/schemas/match_in_db_details'
+    matches_full_details_with_event_log:
+      type: array
+      items:
+        type: object
+        properties:
+          match_with_event_log:
+            allOf:
+            - $ref: '#/components/schemas/match_full_details'
+            - type: array
+              items:
+                allOf:
+                - type: integer
+                  description: match_id
+                - $ref: '#/components/schemas/new_game_event'
+    basic_player_details:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 82808
+        name:
+          type: string
+          example: 'Avichai Edri'
+        nationality:
+          type: string
+          example:  'Denmark'
+        country:
+          type: string
+          example:  'Denmark'
+        birth_date:
+          type: string
+          example:  '31/03/1985'
+        height:
+          type: string
+          example: '188 cm'
+        weight:
+          type: string
+          example: '78 kg'
+        image: 
+          type: string
+          description: image_path
+          example: 'https://cdn.sportmonks.com/images/soccer/players/24/82808.png'

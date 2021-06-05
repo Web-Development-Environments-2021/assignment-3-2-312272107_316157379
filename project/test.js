@@ -1,11 +1,3 @@
-try{
-    throw new Error();
-}
-catch(error){
-    if(error instanceof String){
-        console.log('string');
-    }
-    else{
-        console.log(typeof error);
-    }
-}
+let match_id = 7;
+match_id = [match_id].join(',');
+console.log(match_id);

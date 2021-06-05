@@ -19,9 +19,9 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
     // returns object based on category name and name query
     let search_results = await search_utils.search_by_category_and_query(category_name,req.params.name_query);
     
-    const utils_by_category = await users_utils.get_utils_by_category(category_name);
+    const utils_by_category = users_utils.get_utils_by_category(category_name);
 
-    const search_results_info = utils_by_category.get_info(search_results,'search');
+    const search_results_info = await utils_by_category.get_info(search_results,'search');
 
     res.status(200).send(search_results_info);
     logStream.end(`search for ${req.params.name_query} was successful`);

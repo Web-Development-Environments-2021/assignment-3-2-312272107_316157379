@@ -58,7 +58,7 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     // get and use the correct function to get the favorites using the ids extracted based on the category.
     const favorites_utils = await users_utils.get_utils_by_category(category_name);
 
-    const favorites_info = await favorites_utils.get_info(favorites,'favorites');// get info to display based on category
+    const favorites_info = await favorites_utils.get_info(favorites_ids,'favorites');// get info to display based on category
 
     res.status(200).send(favorites_info);
     logStream.end("successfully returned favorites");

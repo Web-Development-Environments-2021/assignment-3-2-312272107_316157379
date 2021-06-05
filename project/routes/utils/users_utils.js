@@ -90,7 +90,7 @@ async function insert_new_favorite(category_name,user_id,favorite_id){
     );
   }
   catch{
-    throw { status: 400, message: "game already in favorites or bad input when trying to insert to favorites" }
+    throw { status: 400, message: "already in favorites or bad input when trying to insert to favorites" }
   }
 
 }

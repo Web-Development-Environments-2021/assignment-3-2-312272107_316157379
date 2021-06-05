@@ -1,5 +1,4 @@
 const DButils = require("./DButils");
-const info_include_param = "";
 const event_types = {
   home_team_goal: "Home-Goal",
   away_team_goal: "Away-Goal",
@@ -14,13 +13,6 @@ const event_types = {
 };
 const {role_to_role_name} = require('./users_utils');
 
-// retrieves favorite matches that are not over
-async function get_info(matches_ids, category) {
-  const matches_ids_as_string = matches_ids.join();
-  const matches_query = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
-  const matches_info = await get_matches_by_query(matches_query);
-  return matches_info;
-}
 
 async function get_next_match_in_league() {
   const next_match = await DButils.execQuery(
@@ -70,7 +62,7 @@ async function insert_new_event(
       break;
     case event_types.match_over: 
       is_over = 1;
-      await DButils.execQuery(`DELETE * FROM dbo.favorite_matches WHERE = match_id=${match_id}`);// remove from favorites
+      await DButils.execQuery(`DELETE FROM dbo.favorite_matches WHERE match_id=${match_id}`);// remove from favorites
       break;
     case event_types.home_team_goal:
       home_scores = 1;
@@ -219,30 +211,21 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
   return match_info_with_event_log;
 }
 
-//past matches 
-async function get_favorites(matches_ids){
-  try{
-    const matches_not_ended = await DButils.execQuery(
-      `SELECT * FROM dbo.matches WHERE is_over=1 AND match_id IN (${matches_ids})`
-    ); 
-    return matches_not_ended;
-  }
-  catch{
-    throw {
-      status:400,
-      message: 'Something went wrong when trying to grab favorite matches'
-    }
-  }
-
+// retrieves favorite matches that are not over
+async function get_info(matches_ids, category) {
+  const matches_ids_as_string = matches_ids.join();
+  const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
+  const matches_info = await get_matches_by_query(matches_in_league_and_not_over);
+  return matches_info;
 }
 
+
 exports.event_types = event_types;
-exports.info_include_param = info_include_param;
-exports.add_event_logs_to_past_matches = add_event_logs_to_past_matches;
+// exports.add_event_logs_to_past_matches = add_event_logs_to_past_matches;
 exports.get_matches_by_query = get_matches_by_query;
-exports.get_favorites = get_favorites;
 exports.verify_active_match = verify_active_match;
 exports.insert_new_event = insert_new_event;
 exports.insert_new_match = insert_new_match;
 exports.check_add_match_depenedecies = check_add_match_depenedecies;
 exports.get_next_match_in_league = get_next_match_in_league;
+exports.get_info = get_info;

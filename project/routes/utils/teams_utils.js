@@ -115,7 +115,7 @@ async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
     } catch (error) {
       throw {
         status: 404,
-        message: "couldn't find venue for team",
+        message: "couldn't find venue for match",
       };
     }
   }
