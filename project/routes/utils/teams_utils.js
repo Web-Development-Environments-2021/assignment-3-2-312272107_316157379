@@ -4,11 +4,25 @@ let info_include_param = "league";
 
 const users_utils = require("./users_utils");
 const players_utils = require("./players_utils");
-const DButils = require("./DButils");
+const search_utils = require("./search_utils");
+const LEAGUE_ID = 271;
+
+async function get_info(teams,caller){
+    let teams_as_objects;
+    if(caller == 'favorites'){
+       teams_as_objects = await users_utils.get_object_by_id(teams,'team');
+    }
+    else{ // favorites already as objects
+      teams_as_objects = teams;
+    }
+    const teams_in_league = filter_by_league(teams_as_objects,LEAGUE_ID);
+    const teams_info = extract_relevant_data(teams_in_league);
+    return teams_info;
+}
 
 
-function get_info(teams_info) {
-  return teams_info.map((team_info) => {
+function extract_relevant_data(teams) {
+  const teams_info =  teams.map((team_info) => {
     const { id, name, logo_path, venue_id } = team_info;
     return {
       id: id,
@@ -17,6 +31,7 @@ function get_info(teams_info) {
       venue_id: venue_id,
     };
   });
+  return teams_info
 }
 
 function filter_by_league(teams_objects, league_id) {
@@ -36,42 +51,6 @@ function filter_by_league(teams_objects, league_id) {
   return teams_in_league;
 }
 
-
-async function get_teams_matches(matches_query) {
-  const event_log_info_query = await DButils.execQuery(
-    `SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game`
-  );
-  let matches_info = await DButils.execQuery(matches_query);
-  matches_info = add_event_log_to_matches_info(
-    event_log_info_query,
-    matches_info
-  );
-
-  return matches_info;
-}
-
-function add_event_log_to_matches_info(event_log_info_query, matches_info) {
-  // make an object of arrays, each array mapping match_id to event log (events)
-  let event_logs_grouped_by_id = event_log_info_query.reduce(
-    (match_id_to_event_log_acc, match) => {
-      match_id_to_event_log_acc[match.match_id] = [
-        ...(match_id_to_event_log_acc[match.match_id] || []),
-        match,
-      ];
-      return match_id_to_event_log_acc;
-    },
-    {}
-  );
-
-  // add each event log array to matches_info as additional property
-  return matches_info.map(
-    (match) =>
-      (match.event_log = Object.values(event_logs_grouped_by_id).find(
-        (event_log) => match.match_id === event_log[0].match_id
-      ))
-  );
-}
-
 async function get_player_and_team_info(team_id, league_id = 271) {
   let player_ids = [];
   let team_with_players = await axios.get(`${api_domain}/teams/${team_id}`, {
@@ -81,13 +60,13 @@ async function get_player_and_team_info(team_id, league_id = 271) {
     },
   });
   const team_name = team_with_players[0].data.data.name;
-
+  
   team_with_players = filter_by_league(team_with_players, league_id);
-
+  
   team_with_players[0].data.data.squad.data.map((player) =>
-    player_ids.push(player.player_id)
+  player_ids.push(player.player_id)
   );
-
+  
   const players = await users_utils.get_object_by_id(player_ids, "players");
   const player_info = players_utils.extract_relevant_data(players);
   
@@ -102,37 +81,39 @@ async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
     "teams",
     team_name,
     league_id
-  );
-  const team_in_league = get_info(teams_matching_name, league_id);
-  if (team_in_league.length != 1) {
-    throw {
-      status: 400,
-      message: `could not match ${team_name} to a team in the given league`,
-    };
+    );
+    teams_matching_name_in_league = filter_by_league(teams_matching_name,league_id);
+    const team_in_league = extract_relevant_data(teams_matching_name_in_league, league_id);
+    if (team_in_league.length != 1) {
+      throw {
+        status: 400,
+        message: `could not match ${team_name} to a team in the given league`,
+      };
+    }
+    return team_in_league;
   }
-  return team_in_league;
-}
-
-// ************************** fix catch
-async function get_venue(venue_id) {
-  try {
-    return await axios.get(`${api_domain}/venues/${venue_id}`, {
-      params: {
-        api_token: process.env.api_token,
-      },
-    });
-  } catch (error) {
-    throw {
-      status: 404,
-      message: "couldn't find venue for team",
-    };
+  
+  // ************************** fix catch
+  async function get_venue(venue_id) {
+    try {
+      return await axios.get(`${api_domain}/venues/${venue_id}`, {
+        params: {
+          api_token: process.env.api_token,
+        },
+      });
+    } catch (error) {
+      throw {
+        status: 404,
+        message: "couldn't find venue for team",
+      };
+    }
   }
-}
-
-exports.get_venue = get_venue;
-exports.get_team_in_league = get_team_in_league;
-exports.get_info = get_info;
-exports.info_include_param = info_include_param;
-exports.get_favorites_info = get_favorites_info;
-exports.get_teams_matches = get_teams_matches;
-exports.get_player_and_team_info = get_player_and_team_info;
+  
+  
+  exports.info_include_param = info_include_param;
+  exports.get_venue = get_venue;
+  exports.get_team_in_league = get_team_in_league;
+  exports.get_info = extract_relevant_data;
+  exports.get_player_and_team_info = get_player_and_team_info;
+  exports.get_info = get_info;
+  

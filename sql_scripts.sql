@@ -10,7 +10,6 @@
 -- 	[last_name] [varchar](50) NULL,
 -- 	[email] [varchar](50) NULL,
 -- 	[profile_pic] [varchar](50) NULL,
---  [last_search] [varchar](50) NULL
 -- )
 
 
@@ -103,12 +102,9 @@
 -- Drop Table dbo.matches;
 --*************************************************** 
 
--- update matches SET is_over=0 WHERE match_id=7;
--- select * from matches 
--- delete from matches_event_log
-    
 
 
-
-
-
+-- update matches set is_over=1 where match_id=7;
+-- select * from matches_event_log 
+-- update matches SET stage='Knock Out';
+select * from matches

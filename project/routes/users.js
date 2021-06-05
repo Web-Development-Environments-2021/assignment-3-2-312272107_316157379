@@ -4,12 +4,7 @@ const DButils = require("./utils/DButils");
 const users_utils = require("./utils/users_utils");
 let fs = require("fs");
 let logStream = fs.createWriteStream("log.txt", { flags: "a" });
-const {plural} = require('pluralize'); // requires testing
-const LEAGUE_ID = 271;
 
-/**
- * Authenticate all incoming requests by middleware
- */
 router.use(async function (req, res, next) {
   try{
     if (req.session && req.session.user_id) {
@@ -34,24 +29,12 @@ router.post("/favorites/:category_name", async (req, res, next) => {
     const category_name = req.params.category_name;
     const user_id = req.session.user_id;
     const favorite_id = req.body.favorite_id;
-    const category_name_as_plural = plural(category_name);
-
+    
     await users_utils.verify_category(category_name,users_utils.favorite_categories);
+    await users_utils.insert_new_favorite(category_name,user_id,favorite_id);
 
-
-    const favorite = await DButils.execQuery(
-      `SELECT * FROM dbo.favorite_${category_name_as_plural} WHERE (user_id='${user_id}') AND (${category_name}_id= '${favorite_id}')`
-    );
-
-    if (favorite.length > 0 )
-      throw { status: 409, message: "game already in favorites" };
-
-
-    await DButils.execQuery( 
-      `INSERT INTO dbo.favorite_${category_name_as_plural} VALUES (${user_id},${favorite_id})`
-    );
     const success_message = `The ${category_name} was successfully saved as a favorite`;
-    res.status(201).send(favorite_id);
+    res.status(201).send(success_message);
     logStream.end(success_message);
   } catch (error) {
     logStream.end(error.message);
@@ -72,11 +55,10 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     
     const favorites_ids = await users_utils.get_favorites_ids(category_name,user_id);
 
-    // get and use the correct function to return information based on category, using the ids extracted
+    // get and use the correct function to get the favorites using the ids extracted based on the category.
     const favorites_utils = await users_utils.get_utils_by_category(category_name);
-    let favorites = await users_utils.get_object_by_id(favorites_ids,category_name);
-    favorites = favorites_utils.filter_by_league(favorites,LEAGUE_ID);
-    const favorites_info = await favorites_utils.get_info(favorites);
+
+    const favorites_info = await favorites_utils.get_info(favorites,'favorites');// get info to display based on category
 
     res.status(200).send(favorites_info);
     logStream.end("successfully returned favorites");

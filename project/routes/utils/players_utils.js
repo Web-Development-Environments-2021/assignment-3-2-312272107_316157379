@@ -1,7 +1,7 @@
 let info_include_param = `team,stats,position`;
 
 
-function get_info(players) {
+function extract_relevant_data(players) {
   return players.map((player_info) => {
     const { player_id,common_name,nationality,birthdate,birthcountry,height,weight, fullname, image_path } =
       player_info;
@@ -43,6 +43,18 @@ function filter_by_league(players_objects,LEAGUE_ID) {
 }
 
 
+async function get_info(players,caller){
+  let players_as_objects;
+  if(caller == 'favorites'){
+    players_as_objects = await users_utils.get_object_by_id(players,'player');
+  }
+  else{ // favorites already as objects
+    players_as_objects = teams;
+  }
+  const players_in_league = filter_by_league(players_as_objects,LEAGUE_ID);
+  const players_info = extract_relevant_data(players_in_league);
+  return players_info;
+}
 
 
 exports.get_info = get_info;

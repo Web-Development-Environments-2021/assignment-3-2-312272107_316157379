@@ -40,20 +40,29 @@ async function verify_category(category_name,categories){
  }
 
 async function get_object_by_id(ids,category_name) {
-  const utils = get_utils_by_category(category_name);
-  let promises = [];
-  ids.map((id) =>
-    promises.push(
-      axios.get(`${api_domain}/${plural(category_name)}/${id}`, {
-        params: {
-          api_token: process.env.api_token,
-          include: utils.info_include_param
-        },
-      })
-    )
-  );
-  const objects = await Promise.all(promises);
-  return objects;
+  try{
+    const utils = get_utils_by_category(category_name);
+    let promises = [];
+    ids.map((id) =>
+      promises.push(
+        axios.get(`${api_domain}/${plural(category_name)}/${id}`, {
+          params: {
+            api_token: process.env.api_token,
+            include: utils.info_include_param
+          },
+        })
+      )
+    );
+    const objects = await Promise.all(promises);
+    return objects;
+  }
+  catch{
+    throw{
+      status: 400,
+      message: 'Something went wrong when trying to query external API'
+    }
+  }
+
 }
 
  
@@ -66,6 +75,26 @@ async function validate_role(user_id,role){
     }
 }
 
+async function insert_new_favorite(category_name,user_id,favorite_id){
+  try{
+    const category_name_as_plural = plural(category_name);
+    const favorite = await DButils.execQuery(
+      `SELECT * FROM dbo.favorite_${category_name_as_plural} WHERE (user_id='${user_id}') AND (${category_name}_id= '${favorite_id}')`
+    );
+
+    if (favorite.length > 0 )
+      throw '';
+
+    await DButils.execQuery( 
+      `INSERT INTO dbo.favorite_${category_name_as_plural} VALUES (${user_id},${favorite_id})`
+    );
+  }
+  catch{
+    throw { status: 400, message: "game already in favorites or bad input when trying to insert to favorites" }
+  }
+
+}
+
 
 
 
@@ -76,5 +105,6 @@ exports.verify_category = verify_category;
 exports.get_utils_by_category = get_utils_by_category
 exports.get_favorites_ids = get_favorites_ids;
 exports.get_object_by_id = get_object_by_id;
+exports.insert_new_favorite = insert_new_favorite;
 
 

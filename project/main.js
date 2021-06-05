@@ -56,26 +56,27 @@ const union_rep = require("./routes/roles/union_rep_role");
 const league = require("./routes/league");
 const teams = require("./routes/teams");
 const search = require("./routes/search");
-// const matches = require("./routes/matches");
+const matches = require("./routes/matches");
+const players = require("./routes/players");
 
 //#endregion
 
-//#region cookie middleware
-app.use(function (req, res, next) {
-  if (req.session && req.session.user_id) {
-    DButils.execQuery("SELECT user_id FROM users")
-      .then((users) => {
-        if (users.find((x) => x.user_id === req.session.user_id)) {
-          req.user_id = req.session.user_id;
-        }
-        next();
-      })
-      .catch((error) => next());
-  } else {
-    next();
-  }
-});
-//#endregion
+// //#region cookie middleware
+// app.use(function (req, res, next) {
+//   if (req.session && req.session.user_id) {
+//     DButils.execQuery("SELECT user_id FROM users")
+//       .then((users) => {
+//         if (users.find((x) => x.user_id === req.session.user_id)) {
+//           req.user_id = req.session.user_id;
+//         }
+//         next();
+//       })
+//       .catch((error) => next());
+//   } else {
+//     next();
+//   }
+// });
+// //#endregion
 
 // ----> For cheking that our server is alive
 // app.get("/alive", (req, res) => res.send("I'm alive"));
@@ -86,7 +87,8 @@ app.use("/users/union_rep", union_rep);
 app.use("/league", league);
 app.use("/teams", teams);
 app.use("/search",search);
-// app.use("/match",matches);
+app.use("/players",players);
+app.use("/matches",matches);
 app.use(auth);
 
 app.use(function (err, req, res, next) {

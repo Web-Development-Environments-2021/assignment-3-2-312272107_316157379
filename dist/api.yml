@@ -10,7 +10,6 @@ paths:
     post:
       tags: 
         - authentication
-        - tested
       summary: register 
       description: register new user to system
       requestBody:
@@ -30,7 +29,6 @@ paths:
     post:
       tags: 
         - authentication
-        - tested
       summary: user log in
       requestBody:
         required: true
@@ -57,7 +55,6 @@ paths:
     get:
       tags: 
         - league
-        - tested
       summary: get_league_details 
       description: retrieves the league's name, stage name, season and next match details.
       responses:
@@ -77,6 +74,7 @@ paths:
         required: true
         schema:
           type: integer
+          example: null
       responses:
         "200":
           description: "successfully retrieved matches"
@@ -116,6 +114,7 @@ paths:
   #         description: "returned match that matches id"
   #       "404":
   #         description: "invalid match id"
+  
   /users/union_rep/matches:
     post:
       tags: 
@@ -133,6 +132,7 @@ paths:
           description: "match successfully added"
         '400':
           description: "match could not be added"
+          
   /users/union_rep/matches/{match_id}/event_log:
     post:
       tags: 
@@ -151,22 +151,23 @@ paths:
           description: "event added successfully"
         '404':
           description: "match could not be found"
-  # /players/{player_id}:
-  #   get:
-  #     tags: 
-  #       - players
-  #     summary: get_player_by_id 
-  #     parameters: 
-  #     - in: "path"
-  #       name: player_id
-  #       required: true
-  #       schema:
-  #         type: integer
-  #     responses:
-  #       "200":
-  #         description: "returned player that matches player id"
-  #       "404":
-  #         description: "invalid player id"
+  /players/{player_id}:
+    get:
+      tags: 
+        - players
+      summary: get_player_by_id 
+      description: get preview of player for player page
+      parameters: 
+      - in: "path"
+        name: player_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: ''
+        "404":
+          description: "invalid player id"
   # /users/{user_id}:   
   #   get:
   #     tags: 
@@ -221,6 +222,7 @@ paths:
           description: "returned players that match name query"
         "404":
           description: "invalid name query, could not find players"
+          
   /teams/{team_name}/matches:
     get:
       tags: 
@@ -243,7 +245,7 @@ paths:
       tags: 
         - favorites
       summary: get_favorites 
-      description: fetch all favorite {category_name}s of {user_id}
+      description: fetch all favorite {category_name}s of {user_id}. 
       parameters:
       - name: user_id
         in: cookie 
@@ -255,6 +257,7 @@ paths:
         required: true
         schema:
           type: string
+          example: match, team or player.
       responses:
         "200":
           description: ''
@@ -274,15 +277,19 @@ paths:
       - name: category_name
         in: path
         required: true
-        description: currently supporting matches only
         schema:
           type: string
-      - name: favorite_id
-        in: query
+      requestBody:
         required: true
-        description: identifies the favorite {category_name} to add
-        schema:
-          type: integer
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                favorite_id:
+                  type: integer
+                  description: id of favorite {category_name} to add to user
+                  example: 3
       responses:
         '200':
           description: "The {category_name} was successfully saved as a favorite"
@@ -362,7 +369,7 @@ components:
     new_game_event:
       type: object
       properties:
-        minute_in_game: #can also be a string with a name
+        minute_in_game:
           type: integer
           description: exact time during match in which the event occurred
           minimum: 0

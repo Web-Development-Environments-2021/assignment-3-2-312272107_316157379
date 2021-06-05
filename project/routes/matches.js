@@ -1,20 +1,16 @@
 var express = require("express");
 var router = express.Router();
-const players_utils = require("./utils/players_utils");
-const league_utils = require("./utils/league_utils");
-const teams_utils = require("./utils/teams_utils");
-
-
-const DButils = require("./DButils");
-const LEAGUE_ID = 271;
+const matches_utils = require("./utils/matches_utils");
+const fs = require('fs');
+const logStream = fs.createWriteStream('log.txt', {flags: 'a'});
 
 
 // returns all matches' info in current stage, past games also include their event logs.
 router.get("/:stage_id", async (req, res, next) => {
     try {
-        const matches_query = `SELECT * from dbo.matches WHERE stage=${req.params.stage_id}`;
-        const matches_full_info = teams_utils.get_teams_matches(matches_query);
-        res.status(200).send(matches_full_info);
+        const matches_in_stage_query = `SELECT * from dbo.matches WHERE stage=${req.params.stage_id}`;
+        const matches_in_stage = await matches_utils.get_matches_by_query(matches_in_stage_query);
+        res.status(200).send(matches_in_stage);
         logStream.end(`matches retrieved successfully`);
       } catch (error) {
         logStream.end(error.message);

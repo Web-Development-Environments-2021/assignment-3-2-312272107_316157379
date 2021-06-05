@@ -8,9 +8,6 @@ const logStream = fs.createWriteStream("log.txt", { flags: "a" });
 const search_utils = require('./utils/search_utils');
 const LEAGUE_ID = 271; // SUPERLIGA
 
-
-
-// league_id should arrive as query_param
 router.get("/:category_name/:name_query", async (req, res, next) => {
   try {
     const category_name = req.params.category_name;
@@ -24,15 +21,8 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
     
     const utils_by_category = await users_utils.get_utils_by_category(category_name);
 
-    search_results = utils_by_category.filter_by_league(search_results,LEAGUE_ID);
-    const search_results_info = utils_by_category.get_info(search_results);
+    const search_results_info = utils_by_category.get_info(search_results,'search');
 
-    // users have their last search saved
-    if (req.session.user_id) {
-      await DButils.execQuery( 
-        `UPDATE dbo.users SET last_search=${name_query} WHERE user_id=${user_id}`
-        );
-    }
     res.status(200).send(search_results_info);
     logStream.end(`search for ${req.params.name_query} was successful`);
   } catch (error) {
