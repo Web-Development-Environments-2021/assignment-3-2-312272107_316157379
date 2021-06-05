@@ -10,7 +10,7 @@ const axios = require("axios");
 async function search_by_category_and_query(category_name, name_query) {
   try{
     const utils = users_utils.get_utils_by_category(category_name);
-    const search_results = await axios.get(
+    let search_results = await axios.get(
       `${api_domain}/${plural(category_name)}/search/${name_query}`,
       {
         params: {
