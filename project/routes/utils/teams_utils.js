@@ -93,7 +93,7 @@ async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
     team_name,
     league_id
     );
-    teams_matching_name_in_league = filter_by_league(teams_matching_name,league_id);
+    teams_matching_name_in_league = filter_by_league(teams_matching_name.data.data,league_id);
     const team_in_league = extract_relevant_data(teams_matching_name_in_league, league_id);
     if (team_in_league.length != 1) {
       throw {
