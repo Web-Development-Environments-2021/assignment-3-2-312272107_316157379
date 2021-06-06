@@ -60,7 +60,11 @@ async function get_player_and_team_info(team_id, league_id = 271) {
         api_token: process.env.api_token,
       },
     });
-    team_with_players = filter_by_league(team_with_players.data.data, league_id);
+    team_with_players = team_with_players.data.data;
+    team_with_players = filter_by_league(team_with_players, league_id);
+    if(team_with_players.length == 0){ // no teams that match
+      throw '';
+    }
     team_with_players = team_with_players[0];
     const team_name = team_with_players.name; 
     const players_info = team_with_players.squad.data.map(player => players_utils.get_basic_info(player.player.data));
@@ -81,7 +85,7 @@ async function get_player_and_team_info(team_id, league_id = 271) {
   catch{
     throw{
       status: 400,
-      message: "Something went wrong when trying to retrieve team or players' details"
+      message: "Something went wrong when trying to retrieve team or players' details for team page"
     }
   }
 
