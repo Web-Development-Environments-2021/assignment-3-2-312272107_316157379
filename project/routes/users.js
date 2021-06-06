@@ -8,7 +8,7 @@ let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 router.use(async function (req, res, next) {
   try{
     if (req.session && req.session.user_id) {
-      await DButils.execQuery("SELECT user_id FROM dbo.users")
+        await DButils.execQuery("SELECT user_id FROM dbo.users")
         .then((users) => {
           if (users.find((x) => x.user_id === req.session.user_id)) {
             req.user_id = req.session.user_id;

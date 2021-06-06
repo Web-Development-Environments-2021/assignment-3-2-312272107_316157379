@@ -146,14 +146,14 @@ async function insert_new_match(
   away_team_name,
   venue_name,
   referee_id,
-  stage_id
+  stage
 ) {
   try {
     const match_id = await DButils.execQuery(
       `
         INSERT INTO dbo.matches(match_date_time,home_team,away_team,venue,home_team_goals,away_team_goals,referee_id,is_over,stage)
         OUTPUT INSERTED.match_id
-        VALUES (convert(varchar,'${date_time}', 20),'${home_team_name}','${away_team_name}','${venue_name}',0,0,${referee_id},0,${stage_id});
+        VALUES (convert(varchar,'${date_time}', 20),'${home_team_name}','${away_team_name}','${venue_name}',0,0,${referee_id},0,'${stage}');
         `
     );
     return match_id;
@@ -214,9 +214,12 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
 
 // retrieves favorite matches that are not over
 async function get_info(matches_ids, category) {
-  const matches_ids_as_string = matches_ids.join();
-  const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
-  const matches_info = await get_matches_by_query(matches_in_league_and_not_over);
+  let matches_info = [];
+  if (matches_ids.length > 0){
+    const matches_ids_as_string = matches_ids.join();
+    const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
+    matches_info = await get_matches_by_query(matches_in_league_and_not_over);
+  }
   return matches_info;
 }
 

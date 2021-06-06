@@ -22,7 +22,7 @@ router.use(async function (req, res, next) {
 
 router.post('/matches', async (req, res, next) => {
   try {
-    const { date_time, home_team_name, away_team_name,stage_id } = req.body;
+    const { date_time, home_team_name, away_team_name,stage } = req.body;
 
     //verify that teams exist in league
     const home_team = await teams_utils.get_team_in_league(
@@ -39,7 +39,7 @@ router.post('/matches', async (req, res, next) => {
 
     const venue = await teams_utils.get_venue(home_team[0].venue_id);
 
-    const match_id = await matches_utils.insert_new_match(date_time,home_team_name,away_team_name,venue.data.data.name,referee_id,stage_id);
+    const match_id = await matches_utils.insert_new_match(date_time,home_team_name,away_team_name,venue.data.data.name,referee_id,stage);
     const success_message = 'match created succesfully'; 
     res.status(201).send(success_message);
     logStream.end(success_message);
