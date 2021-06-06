@@ -6,7 +6,7 @@ const search_categories = {
 const { plural } = require("pluralize");
 const users_utils = require("./users_utils");
 const axios = require("axios");
-
+//check
 async function search_by_category_and_query(category_name, name_query) {
   try{
     const utils = users_utils.get_utils_by_category(category_name);
