@@ -1,4 +1,4 @@
-let info_include_param = `team,stats,position`;
+const info_include_param = `team,stats,position`;
 const LEAGUE_ID = 271;
 const users_utils = require("./users_utils");
 
@@ -57,7 +57,7 @@ async function get_info(players, caller) {
   return players_info;
 }
 
-exports.get_info = get_info;
 exports.info_include_param = info_include_param;
+exports.get_info = get_info;
 exports.filter_by_league = filter_by_league;
 exports.get_basic_info = get_basic_info;

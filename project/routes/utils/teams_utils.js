@@ -1,6 +1,6 @@
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const axios = require("axios");
-let info_include_param = "league";
+const info_include_param = "league";
 
 const users_utils = require("./users_utils");
 const players_utils = require("./players_utils");
@@ -90,8 +90,7 @@ async function get_player_and_team_info(team_id, league_id = 271) {
 async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
   let teams_matching_name = await search_utils.search_by_category_and_query(
     "teams",
-    team_name,
-    league_id
+    team_name
     );
     teams_matching_name_in_league = filter_by_league(teams_matching_name.data.data,league_id);
     const team_in_league = extract_relevant_data(teams_matching_name_in_league, league_id);
