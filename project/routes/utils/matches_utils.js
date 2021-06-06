@@ -118,7 +118,7 @@ async function check_add_match_depenedecies(
       DECLARE @date_time_as_date AS DATE
       SET @date_time_as_date = '${date_time}'
   
-      SELECT user_id  FROM user_roles WHERE user_role = '${role_to_role_name.REFEREE}' AND user_id NOT IN
+      SELECT user_id  FROM user_roles WHERE user_role = '${role_to_role_name.REFEREE}' AND user_id IN
       ( 
         SELECT referee_id from matches WHERE
         (
