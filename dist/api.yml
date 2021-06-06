@@ -234,6 +234,8 @@ paths:
                 $ref: '#/components/schemas/player_full_details'
         "404":
           description: "invalid player id"
+        "400":
+          description: 'something went wrong when trying to query external API'
 
   /search/{category_name}/{name_query}:
     get:
