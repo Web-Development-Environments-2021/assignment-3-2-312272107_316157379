@@ -247,7 +247,7 @@ paths:
           type: string
       responses:
         "200":
-          description: "returned players that match name query"
+          description: "returned {category_name} that matches query {name_query}"
           content:
             application/json:
               schema:
@@ -377,7 +377,7 @@ components:
     new_match:
       type: object
       properties:
-        match_date_time:
+        date_time:
           type: string
           format: date-time
           description: 'yyyy-mm-dd hh:mm:ss'

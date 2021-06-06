@@ -114,16 +114,19 @@ async function check_add_match_depenedecies(
       ( datediff(day, @date_time_as_date, CAST(match_date_time AS DATE) ) = 0)     
         `
     );
+
+
+
+
     const free_referees = await DButils.execQuery(
       `
       DECLARE @date_time_as_date AS DATE
       SET @date_time_as_date = '${date_time}'
-  
-      SELECT user_id  FROM user_roles WHERE user_role = '${role_to_role_name.REFEREE}' AND user_id IN
+      SELECT user_id FROM dbo.user_roles WHERE user_role = '${role_to_role_name.REFEREE}' AND user_id NOT IN
       ( 
-        SELECT referee_id from matches WHERE
+        SELECT referee_id from dbo.matches WHERE
         (
-           datediff(day,@date_time_as_date, CAST(match_date_time AS DATE)) !=0
+           datediff(day,@date_time_as_date, CAST(match_date_time AS DATE)) = 0
         )
       )
       `

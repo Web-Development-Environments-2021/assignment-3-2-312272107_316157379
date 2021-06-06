@@ -22,7 +22,7 @@ router.use(async function (req, res, next) {
 
 router.post('/matches', async (req, res, next) => {
   try {
-    const { date_time, home_team_name, away_team_name,stage } = req.body;
+    const { date_time, home_team_name, away_team_name,stage  } = req.body;
 
     //verify that teams exist in league
     const home_team = await teams_utils.get_team_in_league(
