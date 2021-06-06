@@ -201,6 +201,12 @@ paths:
         required: true
         schema:
            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/new_game_event'
       responses:
         '201':
           description: "event of type ${event_type_name} was added successfully"
@@ -401,8 +407,8 @@ components:
           example: 35
         event_type:
           type: string
-          description: possible events - Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution. any other event will be labeled as "Other".
-          example: 'Other'
+          description: possible events - Home-Goal,Away-Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution,End-Game any other event will be labeled as "Other".
+          example: 'Red-Card'
         event_description:
           type: string
           example:  red card was given to messi for not being organized
