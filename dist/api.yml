@@ -197,10 +197,10 @@ paths:
       description: add new event to event log of match_id
       parameters:
       - name: match_id
-        in: "path" 
+        in: path 
         required: true
         schema:
-           $ref: '#/components/schemas/new_game_event'
+           type: integer
       responses:
         '201':
           description: "event of type ${event_type_name} was added successfully"
