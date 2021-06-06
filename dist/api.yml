@@ -101,7 +101,7 @@ paths:
                 $ref: '#/components/schemas/matches_full_details_with_event_log'
         "400":
           description: Something went wrong when trying to search for matches
-  /matches/{stage_id}:
+  /matches/{stage_name}:
     get:
       tags: 
         - matches
@@ -109,10 +109,10 @@ paths:
       description: games in current stage page 
       parameters: 
       - in: "path"
-        name: stage_id
+        name: stage_name
         required: true
         schema:
-          type: integer
+          type: string
           example: 0
       responses:
         "200":
@@ -184,7 +184,8 @@ paths:
         '400':
           description: "can't add match due to unmatching depenedencies or bad input"
         '404':
-          description: "couldn't find venue for match"
+          description: 
+            "couldn't find venue for match OR could not match ${team_name} to a team in the given league"
         
           
           
@@ -407,7 +408,7 @@ components:
           example: 35
         event_type:
           type: string
-          description: possible events - Home-Goal,Away-Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution,End-Game any other event will be labeled as "Other".
+          description: possible events - Home-Goal,Away-Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution,End-Match any other event will be labeled as "Other".
           example: 'Red-Card'
         event_description:
           type: string

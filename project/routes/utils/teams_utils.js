@@ -38,7 +38,7 @@ function extract_relevant_data(teams) {
 function filter_by_league(teams, league_id) {
   let teams_in_league = [];
   if (!(teams instanceof Array)) {
-    teams = [teams_objects];
+    teams = [teams];
   }
   teams.map((team_leagues) => {
     if (team_leagues.data) {
@@ -60,7 +60,7 @@ async function get_player_and_team_info(team_id, league_id = 271) {
         api_token: process.env.api_token,
       },
     });
-    team_with_players = filter_by_league(team_with_players, league_id);
+    team_with_players = filter_by_league(team_with_players.data.data, league_id);
     team_with_players = team_with_players[0];
     const team_name = team_with_players.name; 
     const players_info = team_with_players.squad.data.map(player => players_utils.get_basic_info(player.player.data));
@@ -96,7 +96,7 @@ async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
     const team_in_league = extract_relevant_data(teams_matching_name_in_league, league_id);
     if (team_in_league.length != 1) {
       throw {
-        status: 400,
+        status: 404,
         message: `could not match ${team_name} to a team in the given league`,
       };
     }
