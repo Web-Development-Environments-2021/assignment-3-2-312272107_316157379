@@ -102,6 +102,7 @@ async function check_add_match_depenedecies(
   date_time
 ) {
   try {
+    const unique_teams = (home_team_name != away_team_name); 
     const teams_play_today = await DButils.execQuery(
       `
       DECLARE @date_time_as_date AS DATE
@@ -127,7 +128,7 @@ async function check_add_match_depenedecies(
       )
       `
     );
-    if (free_referees.length == 0 || teams_play_today.length != 0) {
+    if (!unique_teams || free_referees.length == 0 || teams_play_today.length != 0) {
       throw "";
     }
     return free_referees[0].user_id;
@@ -214,7 +215,7 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
 // retrieves favorite matches that are not over
 async function get_info(matches_ids, category) {
   const matches_ids_as_string = matches_ids.join();
-  const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=1`;
+  const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
   const matches_info = await get_matches_by_query(matches_in_league_and_not_over);
   return matches_info;
 }
