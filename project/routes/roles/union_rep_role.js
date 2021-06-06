@@ -13,7 +13,7 @@ const LEAGUE_ID = 271; // SuperLiga
 
 router.use(async function (req, res, next) {
   try{
-    users_utils.validate_role(req.session.user_id,users_utils.role_to_role_name.UNION_REP)
+    await users_utils.validate_role(req.session.user_id,users_utils.role_to_role_name.UNION_REP)
     next();
   } catch(error){
     next(error);
