@@ -4,7 +4,6 @@ const players_utils = require("./utils/players_utils");
 const fs = require("fs");
 const logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
-
 // gets player preview information based on player_id from external API
 router.get("/:player_id", async (req, res, next) => {
   try {

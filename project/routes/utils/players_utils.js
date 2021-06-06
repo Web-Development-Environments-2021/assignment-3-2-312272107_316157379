@@ -5,7 +5,7 @@ const users_utils = require("./users_utils");
  *
  *
  * @param {*} player: player object with information extracted from external API
- * @return {Object} containing display information of player 
+ * @return {Object} containing display information of player
  */
 function get_basic_info(player) {
   return {
@@ -22,7 +22,7 @@ function get_basic_info(player) {
 /**
  * display information of player, plus team name and player's position.
  * @param {*} players
- * @return {*} 
+ * @return {*}
  */
 function get_full_info(players) {
   const players_full_info = players.map((player) => {
@@ -34,10 +34,10 @@ function get_full_info(players) {
   return players_full_info;
 }
 /**
- * filters players based on league 
+ * filters players based on league
  *
  * @param {*} players: players object from different leagues
- * @param {*} [league_id=LEAGUE_ID] SuperLiga 
+ * @param {*} [league_id=LEAGUE_ID] SuperLiga
  * @return {*} players in league of league_id
  */
 function filter_by_league(players, league_id = LEAGUE_ID) {
@@ -61,7 +61,7 @@ function filter_by_league(players, league_id = LEAGUE_ID) {
  *
  * @param {*} players: player objects with information or player ids extracted from external API.
  * @param {*} caller: function that has called this function. different callers have different inputs for the function and therefore require different handling.
- * @return {*} 
+ * @return {*}
  */
 async function get_info(players, caller) {
   let players_as_objects;

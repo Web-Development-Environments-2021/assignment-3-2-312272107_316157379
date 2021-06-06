@@ -8,8 +8,8 @@ const config = {
   database: process.env.tedious_database,
   options: {
     encrypt: true,
-    enableArithAbort: true
-  }
+    enableArithAbort: true,
+  },
 };
 
 const pool = new sql.ConnectionPool(config);

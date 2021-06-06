@@ -11,7 +11,7 @@ const event_types = {
   sub: "Substitution",
   other: "Other",
 };
-const {role_to_role_name} = require('./users_utils');
+const { role_to_role_name } = require("./users_utils");
 
 /**
  *
@@ -31,7 +31,7 @@ async function get_next_match_in_league() {
 }
 /**
  *
- * verify that match given exists in the local DB and that it is not over. 
+ * verify that match given exists in the local DB and that it is not over.
  * @param {*} match_id
  */
 async function verify_active_match(match_id) {
@@ -51,16 +51,16 @@ async function verify_active_match(match_id) {
   }
 }
 /**
- * insert new event to match's event log. 
+ * insert new event to match's event log.
  * if the event is of type 'game over', the match is deleted from favorites.
- * if the event is of type 'goal', the score is updated. 
- * 
+ * if the event is of type 'goal', the score is updated.
+ *
  *
  * @param {*} match_id
  * @param {*} minute_in_game
  * @param {*} event_type: Goal,Red-Card,End-Match, etc
- * @param {*} event_description: full description of the event-type. 
- * @return {*}: event_type input from user. if not familiar, returns Other.  
+ * @param {*} event_description: full description of the event-type.
+ * @return {*}: event_type input from user. if not familiar, returns Other.
  */
 async function insert_new_event(
   match_id,
@@ -79,9 +79,11 @@ async function insert_new_event(
     case undefined:
       event_type_name = event_types.other;
       break;
-    case event_types.match_over: 
+    case event_types.match_over:
       is_over = 1;
-      await DButils.execQuery(`DELETE FROM dbo.favorite_matches WHERE match_id=${match_id}`);// remove from favorites
+      await DButils.execQuery(
+        `DELETE FROM dbo.favorite_matches WHERE match_id=${match_id}`
+      ); // remove from favorites
       break;
     case event_types.home_team_goal:
       home_scores = 1;
@@ -122,8 +124,8 @@ async function insert_new_event(
  *
  * @param {*} home_team_name
  * @param {*} away_team_name
- * @param {*} date_time: date and time object referring to the start of the match. 
- * @return {*} 
+ * @param {*} date_time: date and time object referring to the start of the match.
+ * @return {*}
  */
 async function check_add_match_depenedecies(
   home_team_name,
@@ -131,7 +133,7 @@ async function check_add_match_depenedecies(
   date_time
 ) {
   try {
-    const unique_teams = (home_team_name != away_team_name); 
+    const unique_teams = home_team_name != away_team_name;
     const teams_play_today = await DButils.execQuery(
       `
       DECLARE @date_time_as_date AS DATE
@@ -143,9 +145,6 @@ async function check_add_match_depenedecies(
       ( datediff(day, @date_time_as_date, CAST(match_date_time AS DATE) ) = 0)     
         `
     );
-
-
-
 
     const free_referees = await DButils.execQuery(
       `
@@ -160,7 +159,11 @@ async function check_add_match_depenedecies(
       )
       `
     );
-    if (!unique_teams || free_referees.length == 0 || teams_play_today.length != 0) {
+    if (
+      !unique_teams ||
+      free_referees.length == 0 ||
+      teams_play_today.length != 0
+    ) {
       throw "";
     }
     return free_referees[0].user_id;
@@ -180,7 +183,7 @@ async function check_add_match_depenedecies(
  * @param {*} venue_name: or court of the home-team
  * @param {*} referee_id: referee assigned to the match
  * @param {*} stage: name of the current stage in the SuperLiga.
- * @return {*} 
+ * @return {*}
  */
 async function insert_new_match(
   date_time,
@@ -207,41 +210,39 @@ async function insert_new_match(
   }
 }
 /**
- * fetches matches based on a pre-determined query. every past match has its' event log attached. 
+ * fetches matches based on a pre-determined query. every past match has its' event log attached.
  *
- * @param {*} matches_query: a query that specifies which matches to retrieve from the local DB. 
+ * @param {*} matches_query: a query that specifies which matches to retrieve from the local DB.
  * @return {*}: matches based on query
  */
 async function get_matches_by_query(matches_query) {
-  try{
+  try {
     const event_log_info_query = await DButils.execQuery(
-      'SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game'
+      "SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game"
     );
     let matches_info = await DButils.execQuery(matches_query);
-    if (matches_info != 0 && event_log_info_query.length != 0 ){
+    if (matches_info != 0 && event_log_info_query.length != 0) {
       matches_info = add_event_logs_to_past_matches(
         event_log_info_query,
         matches_info
       );
     }
     return matches_info;
-  } catch{
-    throw{
-      status:400,
-      message: 'Something went wrong when trying to retrieve matches by query'
-    }
+  } catch {
+    throw {
+      status: 400,
+      message: "Something went wrong when trying to retrieve matches by query",
+    };
   }
-
 }
 /**
  *  make an object of arrays, each array mapping match_id to event log (events)
  *
- * @param {*} event_log_info_query: information of events in event log from the local DB. 
- * @param {*} matches_info: information of matches from the local DB. 
- * @return {*} event log info as part of the matches_info 
+ * @param {*} event_log_info_query: information of events in event log from the local DB.
+ * @param {*} matches_info: information of matches from the local DB.
+ * @return {*} event log info as part of the matches_info
  */
 function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
-
   let event_logs_grouped_by_id = event_log_info_query.reduce(
     (match_id_to_event_log_acc, match) => {
       match_id_to_event_log_acc[match.match_id] = [
@@ -254,33 +255,30 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
   );
 
   // add each event log array to matches_info as additional property
-  const match_info_with_event_log =  matches_info.map(
-    (match) => {
-      (match.event_log = Object.values(event_logs_grouped_by_id).find(
-        (event_log) => match.match_id === event_log[0].match_id
-      ))
-      return match;
-    }
-  );
+  const match_info_with_event_log = matches_info.map((match) => {
+    match.event_log = Object.values(event_logs_grouped_by_id).find(
+      (event_log) => match.match_id === event_log[0].match_id
+    );
+    return match;
+  });
   return match_info_with_event_log;
 }
 /**
  *
  *
  * @param {*} matches_ids: relevant for favorites: retrieves information of matches that haven't finished with their corresponding event logs.
- * @param {*} category: 
+ * @param {*} category:
  * @return {*}: matches full info and event logs from local DB
  */
 async function get_info(matches_ids, category) {
   let matches_info = [];
-  if (matches_ids.length > 0){
+  if (matches_ids.length > 0) {
     const matches_ids_as_string = matches_ids.join();
     const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
     matches_info = await get_matches_by_query(matches_in_league_and_not_over);
   }
   return matches_info;
 }
-
 
 exports.event_types = event_types;
 // exports.add_event_logs_to_past_matches = add_event_logs_to_past_matches;

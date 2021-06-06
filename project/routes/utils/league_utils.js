@@ -9,7 +9,7 @@ const CURRENT_SEASON = 18334;
  *
  *
  * @param {*} league_id
- * @return {*} SuperLiga's information 
+ * @return {*} SuperLiga's information
  */
 async function get_league_by_id(league_id) {
   let league = await axios.get(`${api_domain}/leagues/${LEAGUE_ID}`, {
@@ -46,11 +46,11 @@ async function get_league_by_id(league_id) {
 /**
  *
  *
- * @param {*} stage_id: represents current stage in league. currently given. 
- * @return {*} 
+ * @param {*} stage_id: represents current stage in league. currently given.
+ * @return {*}
  */
 async function get_stage_by_id(stage_id) {
-  try{
+  try {
     let stages = await axios.get(
       `${api_domain}/stages/season/${CURRENT_SEASON}`,
       {
@@ -59,28 +59,27 @@ async function get_stage_by_id(stage_id) {
         },
       }
     );
-  const stage_by_id = stages.data.data.find( (stage) => stage.id == stage_id);
-  return stage_by_id;
-  }
-  catch{
-    throw{
-      status:400,
-      message:'Something went wrong when trying to get stage by id'
-    }
+    const stage_by_id = stages.data.data.find((stage) => stage.id == stage_id);
+    return stage_by_id;
+  } catch {
+    throw {
+      status: 400,
+      message: "Something went wrong when trying to get stage by id",
+    };
   }
 }
 
 /**
- * finds SuperLiga's current stage,season based on external API. 
+ * finds SuperLiga's current stage,season based on external API.
  * retrieves next match from local DB.
  *
- * @return {Object}: league_name, season_name,stage_name,next_match_details 
+ * @return {Object}: league_name, season_name,stage_name,next_match_details
  */
 async function getLeagueDetails() {
   const league = await get_league_by_id(LEAGUE_ID);
   // const stage_id = league.stage_id;
   const stage_id = 77453565; // random stage in season in SuperLiga because league.stage_id is null
-  const stage = await get_stage_by_id(stage_id)
+  const stage = await get_stage_by_id(stage_id);
   let stage_name = null;
   if (stage) {
     stage_name = stage.name;
