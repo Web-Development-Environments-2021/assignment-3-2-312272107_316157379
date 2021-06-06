@@ -81,7 +81,7 @@
 -- select * from dbo.users
 -- select * from dbo.user_roles
 -- select * from dbo.matches_event_log
-
+-- SELECT *from dbo.favorite_matches
 -- SELECt * FROM dbo.matches WHERE match_id IN ('[8,9].join(',')');
 
 
@@ -107,4 +107,5 @@
 -- update matches set is_over=1 where match_id=7;
 -- select * from matches_event_log 
 -- update matches SET stage='Knock Out';
-select * from matches
+-- select * from matches
+-- INSERT Into dbo.user_roles VALUES (15,'union_representative')
