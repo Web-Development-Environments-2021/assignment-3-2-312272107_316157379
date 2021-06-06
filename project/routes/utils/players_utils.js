@@ -1,7 +1,12 @@
 const info_include_param = `team,stats,position`;
 const LEAGUE_ID = 271;
 const users_utils = require("./users_utils");
-
+/**
+ *
+ *
+ * @param {*} player: player object with information extracted from external API
+ * @return {Object} containing display information of player 
+ */
 function get_basic_info(player) {
   return {
     id: player.player_id,
@@ -14,7 +19,11 @@ function get_basic_info(player) {
     image: player.image_path,
   };
 }
-
+/**
+ * display information of player, plus team name and player's position.
+ * @param {*} players
+ * @return {*} 
+ */
 function get_full_info(players) {
   const players_full_info = players.map((player) => {
     let player_info = get_basic_info(player);
@@ -24,7 +33,13 @@ function get_full_info(players) {
   });
   return players_full_info;
 }
-
+/**
+ * filters players based on league 
+ *
+ * @param {*} players: players object from different leagues
+ * @param {*} [league_id=LEAGUE_ID] SuperLiga 
+ * @return {*} players in league of league_id
+ */
 function filter_by_league(players, league_id = LEAGUE_ID) {
   if (!(players instanceof Array)) {
     players = [players];
@@ -41,7 +56,13 @@ function filter_by_league(players, league_id = LEAGUE_ID) {
   });
   return players_in_league;
 }
-
+/**
+ * processes players ids or objects input, returning relevant information only for players in the SuperLiga.
+ *
+ * @param {*} players: player objects with information or player ids extracted from external API.
+ * @param {*} caller: function that has called this function. different callers have different inputs for the function and therefore require different handling.
+ * @return {*} 
+ */
 async function get_info(players, caller) {
   let players_as_objects;
   if (caller != "search") {

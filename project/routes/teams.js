@@ -6,26 +6,14 @@ let fs = require("fs");
 let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
 
-// router.get("/:team_name/matches", async (req, res, next) => {
-//     try {
-//         const team_name = req.params.team_name;
-//         const matches_query = `SELECT * FROM dbo.matches WHERE (home_team='${team_name}') OR (away_team='${team_name}')`;
-//         const matches_full_info = await matches_utils.get_matches_by_query(matches_query);
-//         res.status(200).send(matches_full_info);
-//         logStream.end(`matches successfully retrieved when searching for team ${team_name}`);
-//     } catch (error) {
-//       logStream.end(error.message);
-//       next(error);
-//     }
-//   });
-
-
+// get information for team page - matches team participated in, team preview info and player preview info for each player in the team.
 router.get("/get_page_details/:team_id", async (req, res, next) => {
   
   try {
     const team_players_info = await teams_utils.get_player_and_team_info(
       req.params.team_id
     );
+    // get matches team participated in. 
     const matches_query = `SELECT * from dbo.matches WHERE home_team = '${team_players_info.team_name}'  OR away_team= '${team_players_info.team_name}'`;
     const matches_info = await matches_utils.get_matches_by_query(matches_query);
     const full_team_details ={

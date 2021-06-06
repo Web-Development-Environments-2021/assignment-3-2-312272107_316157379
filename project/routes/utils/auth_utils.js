@@ -1,7 +1,11 @@
 const DButils = require("./DButils");
 const bcrypt = require("bcryptjs");
  
-
+/**
+ *
+ *
+ * @param {*} username: username to validate against db
+ */
 async function validate_username_unique(username){
   await DButils.execQuery(
     `SELECT * FROM dbo.users WHERE username='${username}'`
@@ -14,7 +18,16 @@ async function validate_username_unique(username){
     }
   });
 }
-
+/**
+ *inserts new user to the local DB
+ *
+ * @param {*} username
+ * @param {*} hash_password: password that has been hashed
+ * @param {*} first_name
+ * @param {*} last_name
+ * @param {*} email
+ * @param {*} profile_pic: url for user's profile picture
+ */
 async function insert_new_user(username,hash_password,first_name,last_name,email,profile_pic){
   try{
     await DButils.execQuery(
@@ -31,6 +44,13 @@ async function insert_new_user(username,hash_password,first_name,last_name,email
   }
 
 }
+/**
+ * validate username and password from user against the local DB
+ * input from user: 
+ * @param {*} username
+ * @param {*} password
+ * @return {*}: user's record in DB 
+ */
 
 async function validate_user(username,password){
   try{
@@ -46,8 +66,9 @@ async function validate_user(username,password){
   } catch {
     throw { status: 401, message: "Invalid username/password" };
   }
-
 }
+
+
 async function get_roles_by_id(user_id){
   try{
     const user_roles =  await DButils.execQuery(

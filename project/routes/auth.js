@@ -39,11 +39,13 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
+    // search and return user based on username and password
     const user = await auth_utils.validate_user(
       req.body.username,
       req.body.password
     );
 
+    // find user's roles, if there are any
     req.session.user_id = user.user_id;
     const user_roles = await auth_utils.get_roles_by_id(user.user_id);
 
@@ -62,7 +64,7 @@ router.post("/login", async (req, res, next) => {
 router.get("/logout", function (req, res) {
   const user_id = req.session.user_id;
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-  const success_message = 'user succesfully logged out'; 
+  const success_message = "user succesfully logged out";
   res.status(200).send(success_message);
   logStream.end(`user ${user_id} succesfully logged out`);
 });

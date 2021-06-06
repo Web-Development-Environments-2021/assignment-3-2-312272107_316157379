@@ -5,7 +5,7 @@ const matches_utils = require("./utils/matches_utils");
 const fs = require('fs');
 const logStream = fs.createWriteStream('log.txt', {flags: 'a'});
 
-// retrieves the league's name, stage name, season and next match details.
+// retrieves the league's name, stage name, season and next match details for the front page's right side
 router.get("/details", async (req, res, next) => {
   try {
     const league_details = await league_utils.getLeagueDetails();
@@ -16,6 +16,8 @@ router.get("/details", async (req, res, next) => {
     next(error);
   }
 });
+
+// retrieves all matches in SuperLiga - all matches found in local DB, allong with past matches event logs
 router.get("/:league_id/matches", async (req, res, next) => {
   try {
     const matches_query = 'SELECT * FROM dbo.matches'; // currently not supporting leagues other than SuperLiga

@@ -5,6 +5,8 @@ const users_utils = require("./utils/users_utils");
 let fs = require("fs");
 let logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
+
+// validate user exists in DB based on user_id in cookie.
 router.use(async function (req, res, next) {
   try{
     if (req.session && req.session.user_id) {
@@ -24,13 +26,15 @@ router.use(async function (req, res, next) {
   }
 });
 
+// retrieve favorite category_name of user_id from local DB. 
 router.post("/favorites/:category_name", async (req, res, next) => {
   try {
     const category_name = req.params.category_name;
     const user_id = req.session.user_id;
     const favorite_id = req.body.favorite_id;
-    
+    // only favorite matches, teams or players exist.
     await users_utils.verify_category(category_name,users_utils.favorite_categories);
+
     await users_utils.insert_new_favorite(category_name,user_id,favorite_id);
 
     const success_message = `The ${category_name} was successfully saved as a favorite`;
@@ -44,7 +48,6 @@ router.post("/favorites/:category_name", async (req, res, next) => {
 
 router.get("/favorites/:category_name", async (req, res, next) => {
   try {
-    const LEAGUE_ID = 271; // SuperLiga, generally could be receieved as query param
 
     const category_name = req.params.category_name;
     const user_id = req.session.user_id;

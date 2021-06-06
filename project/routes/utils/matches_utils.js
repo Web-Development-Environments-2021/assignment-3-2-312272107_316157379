@@ -13,10 +13,13 @@ const event_types = {
 };
 const {role_to_role_name} = require('./users_utils');
 
-
+/**
+ *
+ *
+ * @return {*} match from local DB with the closest date to now. every match is from SuperLiga.
+ */
 async function get_next_match_in_league() {
   const next_match = await DButils.execQuery(
-    // TODO doesn't reference any league or season
     `
     SELECT TOP 1 *
     FROM dbo.matches
@@ -26,6 +29,11 @@ async function get_next_match_in_league() {
   );
   return next_match;
 }
+/**
+ *
+ * verify that match given exists in the local DB and that it is not over. 
+ * @param {*} match_id
+ */
 async function verify_active_match(match_id) {
   try {
     const active_match = await DButils.execQuery(
@@ -42,7 +50,18 @@ async function verify_active_match(match_id) {
     };
   }
 }
-
+/**
+ * insert new event to match's event log. 
+ * if the event is of type 'game over', the match is deleted from favorites.
+ * if the event is of type 'goal', the score is updated. 
+ * 
+ *
+ * @param {*} match_id
+ * @param {*} minute_in_game
+ * @param {*} event_type: Goal,Red-Card,End-Match, etc
+ * @param {*} event_description: full description of the event-type. 
+ * @return {*}: event_type input from user. if not familiar, returns Other.  
+ */
 async function insert_new_event(
   match_id,
   minute_in_game,
@@ -95,7 +114,17 @@ async function insert_new_event(
 
   return event_type_name;
 }
-
+/**
+ * verifies that following conditions:
+ * 1. home and away team are different
+ * 2. either team doesn't participate in given date
+ * 3. there is a referee to assign to the match (doesn't participate in other matches at the same day)
+ *
+ * @param {*} home_team_name
+ * @param {*} away_team_name
+ * @param {*} date_time: date and time object referring to the start of the match. 
+ * @return {*} 
+ */
 async function check_add_match_depenedecies(
   home_team_name,
   away_team_name,
@@ -142,7 +171,17 @@ async function check_add_match_depenedecies(
     };
   }
 }
-
+/**
+ * inserts a new match into the local DB.
+ *
+ * @param {*} date_time: date and time object representing the start of the match
+ * @param {*} home_team_name
+ * @param {*} away_team_name
+ * @param {*} venue_name: or court of the home-team
+ * @param {*} referee_id: referee assigned to the match
+ * @param {*} stage: name of the current stage in the SuperLiga.
+ * @return {*} 
+ */
 async function insert_new_match(
   date_time,
   home_team_name,
@@ -167,7 +206,12 @@ async function insert_new_match(
     };
   }
 }
-
+/**
+ * fetches matches based on a pre-determined query. every past match has its' event log attached. 
+ *
+ * @param {*} matches_query: a query that specifies which matches to retrieve from the local DB. 
+ * @return {*}: matches based on query
+ */
 async function get_matches_by_query(matches_query) {
   try{
     const event_log_info_query = await DButils.execQuery(
@@ -189,9 +233,15 @@ async function get_matches_by_query(matches_query) {
   }
 
 }
-
+/**
+ *  make an object of arrays, each array mapping match_id to event log (events)
+ *
+ * @param {*} event_log_info_query: information of events in event log from the local DB. 
+ * @param {*} matches_info: information of matches from the local DB. 
+ * @return {*} event log info as part of the matches_info 
+ */
 function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
-  // make an object of arrays, each array mapping match_id to event log (events)
+
   let event_logs_grouped_by_id = event_log_info_query.reduce(
     (match_id_to_event_log_acc, match) => {
       match_id_to_event_log_acc[match.match_id] = [
@@ -214,8 +264,13 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
   );
   return match_info_with_event_log;
 }
-
-// retrieves favorite matches that are not over
+/**
+ *
+ *
+ * @param {*} matches_ids: relevant for favorites: retrieves information of matches that haven't finished with their corresponding event logs.
+ * @param {*} category: 
+ * @return {*}: matches full info and event logs from local DB
+ */
 async function get_info(matches_ids, category) {
   let matches_info = [];
   if (matches_ids.length > 0){

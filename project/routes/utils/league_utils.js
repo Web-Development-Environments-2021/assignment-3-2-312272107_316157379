@@ -5,7 +5,12 @@ const LEAGUE_ID = 271; // SuperLiga
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const matches_utils = require("./matches_utils");
 const CURRENT_SEASON = 18334;
-
+/**
+ *
+ *
+ * @param {*} league_id
+ * @return {*} SuperLiga's information 
+ */
 async function get_league_by_id(league_id) {
   let league = await axios.get(`${api_domain}/leagues/${LEAGUE_ID}`, {
     params: {
@@ -38,7 +43,12 @@ async function get_league_by_id(league_id) {
 //   }
 // }
 
-
+/**
+ *
+ *
+ * @param {*} stage_id: represents current stage in league. currently given. 
+ * @return {*} 
+ */
 async function get_stage_by_id(stage_id) {
   try{
     let stages = await axios.get(
@@ -60,7 +70,12 @@ async function get_stage_by_id(stage_id) {
   }
 }
 
-
+/**
+ * finds SuperLiga's current stage,season based on external API. 
+ * retrieves next match from local DB.
+ *
+ * @return {Object}: league_name, season_name,stage_name,next_match_details 
+ */
 async function getLeagueDetails() {
   const league = await get_league_by_id(LEAGUE_ID);
   // const stage_id = league.stage_id;

@@ -6,8 +6,9 @@ const fs = require("fs");
 const logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
 const search_utils = require('./utils/search_utils');
-const LEAGUE_ID = 271; // SUPERLIGA
 
+
+// searches for team/player with a partial or full name. 
 router.get("/:category_name/:name_query", async (req, res, next) => {
   try {
     const category_name = req.params.category_name;
