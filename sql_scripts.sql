@@ -5,11 +5,11 @@
 -- CREATE TABLE [dbo].[users](
 -- 	[user_id] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,    
 --  [username] [varchar](50) NOT NULL UNIQUE,
--- 	[password] [varchar](50) NOT NULL,
+-- 	[password] [varchar](300) NOT NULL,
 -- 	[first_name] [varchar](50) NULL,
 -- 	[last_name] [varchar](50) NULL,
 -- 	[email] [varchar](50) NULL,
--- 	[profile_pic] [varchar](50) NULL,
+-- 	[country] [varchar](50) NOT NULL,
 -- )
 
 
@@ -89,23 +89,23 @@
 
 -- Deletion
 -- DELETE FROM dbo.user_roles
+-- DELETE FROM dbo.favorite_matches
+-- DELETE FROM dbo.favorite_teams
+-- DELETE FROM dbo.favorite_players
 -- DELETE FROM dbo.users
 -- DELETE FROM dbo.matches
 -- DELETE FROM dbo.matches_event_log
--- DELETE FROM dbo.favorite_matches
 
 
--- Drop Table dbo.matches_event_log 
--- DROP TABLE dbo.users;
 -- DROP TABLE dbo.favorite_matches;
+-- DROP TABLE dbo.favorite_players;
+-- DROP TABLE dbo.favorite_teams;
 -- DROP TABLE dbo.user_roles;
+-- DROP TABLE dbo.users;
+-- Drop Table dbo.matches_event_log 
 -- Drop Table dbo.matches;
 --*************************************************** 
 
-
-
--- update matches set is_over=1 where match_id=7;
--- select * from matches_event_log 
--- update matches SET stage='Knock Out';
--- select * from matches
--- INSERT Into dbo.user_roles VALUES (15,'union_representative')
+-- ALTER TABLE dbo.users ALTER COLUMN password varchar(300);
+select * from users
+-- insert into users values('asd','asd','asd','asd','asd','asd');
