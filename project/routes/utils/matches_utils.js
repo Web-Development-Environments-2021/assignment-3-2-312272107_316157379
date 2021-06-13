@@ -104,7 +104,8 @@ async function insert_new_event(
     await DButils.execQuery(
       `
       UPDATE matches SET
-      is_over=${is_over},home_team_goals = home_team_goals+${home_scores} ,away_team_goals = away_team_goals+${away_scores}
+      is_over=${is_over},home_team_goals = home_team_goals+${home_scores} ,away_team_goals = away_team_goals+${away_scores} 
+      where match_id =${match_id}
           `
     );
   } catch {
