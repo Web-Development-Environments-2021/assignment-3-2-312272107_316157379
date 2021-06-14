@@ -13,7 +13,7 @@ router.get("/details", async (req, res, next) => {
     logStream.end("league's details successfully retrieved");
   } catch (error) {
     logStream.end(error.message);
-    next(error);
+    next(error); //
   }
 });
 
