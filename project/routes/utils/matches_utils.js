@@ -19,15 +19,19 @@ const { role_to_role_name } = require("./users_utils");
  * @return {*} match from local DB with the closest date to now. every match is from SuperLiga.
  */
 async function get_next_match_in_league() {
-  const next_match = await DButils.execQuery(
-    `
-    SELECT TOP 1 *
-    FROM dbo.matches
-    WHERE matches.match_date_time  >  GETDATE() 
-    ORDER BY dbo.matches.match_date_time ASC
-    `
-  );
-  return next_match;
+  try {
+    let next_match = await DButils.execQuery(
+      `
+      SELECT TOP 1 *
+      FROM dbo.matches
+      WHERE matches.match_date_time  >  GETDATE() 
+      ORDER BY dbo.matches.match_date_time ASC
+      `
+    );
+    return next_match[0];
+  } catch {
+    return {};
+  }
 }
 /**
  *
