@@ -1,14 +1,17 @@
 var express = require("express");
 var router = express.Router();
-const league_utils = require("./utils/league_utils");
+const league_utils = require("./utils/leagues_utils");
 const matches_utils = require("./utils/matches_utils");
 const fs = require("fs");
 const logStream = fs.createWriteStream("log.txt", { flags: "a" });
+const info_include_param = 'season';
 
 // retrieves the league's name, stage name, season and next match details for the front page's right side
-router.get("/details", async (req, res, next) => {
+router.get("/:league_name/details", async (req, res, next) => {
   try {
-    const league_details = await league_utils.getLeagueDetails();
+    const league_name = req.params.league_name
+    league_utils.validate_league_name(league_name);
+    const league_details = await league_utils.getLeagueDetails(league_name);
     res.status(200).send(league_details);
     logStream.end("league's details successfully retrieved");
   } catch (error) {

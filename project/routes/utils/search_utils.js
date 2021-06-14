@@ -6,6 +6,7 @@ const search_categories = {
 const { plural } = require("pluralize");
 const users_utils = require("./users_utils");
 const axios = require("axios");
+const { search } = require("../auth");
 /**
  *
  *
@@ -25,6 +26,9 @@ async function search_by_category_and_query(category_name, name_query) {
         },
       }
     );
+    if (search_results.data.data.length == 0){
+      throw ''
+    }
     return search_results;
   } catch {
     throw {
