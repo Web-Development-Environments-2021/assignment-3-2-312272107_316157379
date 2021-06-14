@@ -106,6 +106,12 @@
 -- Drop Table dbo.matches;
 --*************************************************** 
 
--- ALTER TABLE dbo.users ALTER COLUMN password varchar(300);
-select * from users
--- insert into users values('asd','asd','asd','asd','asd','asd');
+-- ALTER TABLE dbo.users ALTER COLUMN password varchar(400);
+-- delete from dbo.users where username='Afghanistan';
+-- insert into users values('Afghanistan','$2a$13$YmIAQpyIRe4B7klU8NNMM.7/k/AS1f6xLQHnNhbWVTGfyc0rGFiPO','asd@asd.com','tobas','toasd','https://lol.com','tomas');
+-- select * from matches
+-- select * from dbo.users
+
+
+      INSERT INTO dbo.users(username, password,first_name,last_name,email,country,profile_pic) 
+      VALUES ('username','pass','first_name','last_name','email','country','profile_pic');

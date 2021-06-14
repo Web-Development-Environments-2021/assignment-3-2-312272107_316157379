@@ -34,12 +34,13 @@ async function insert_new_user(
   first_name,
   last_name,
   email,
-  country
+  country,
+  profile_pic
 ) {
   try {
     await DButils.execQuery(
-      `INSERT INTO dbo.users (username, password,first_name,last_name,email,country) 
-      VALUES ('${username}', '${hash_password}','${first_name}','${last_name}','${email}','${country}')`
+      `INSERT INTO dbo.users
+      VALUES ('${username}','${hash_password}','${first_name}','${last_name}','${email}','${country}','${profile_pic}')`
     );
   } catch {
     throw {

@@ -27,7 +27,7 @@ async function get_next_match_in_league() {
     ORDER BY dbo.matches.match_date_time ASC
     `
   );
-  return next_match;
+  return next_match[0];
 }
 /**
  *

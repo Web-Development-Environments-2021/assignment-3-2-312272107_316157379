@@ -7,7 +7,7 @@ const logStream = fs.createWriteStream("log.txt", { flags: "a" });
 
 router.post("/register", async (req, res, next) => {
   try {
-    const { username, first_name, last_name, email,country } = req.body;
+    const { username, first_name, last_name, email,country,profile_pic } = req.body;
 
     await auth_utils.validate_username_unique(username);
 
@@ -23,7 +23,8 @@ router.post("/register", async (req, res, next) => {
       first_name,
       last_name,
       email,
-      country
+      country,
+      profile_pic
     );
 
     // const user_id = insert_user_output[0].user_id;

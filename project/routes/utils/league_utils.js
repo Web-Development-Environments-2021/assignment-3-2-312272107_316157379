@@ -84,7 +84,7 @@ async function getLeagueDetails() {
   if (stage) {
     stage_name = stage.name;
   }
-  const next_match = matches_utils.get_next_match_in_league();
+  const next_match = await matches_utils.get_next_match_in_league();
   return {
     league_name: league.name,
     current_season_name: league.season.data.name,
