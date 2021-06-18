@@ -229,7 +229,8 @@ async function get_matches_by_query(matches_query) {
       );
     }
     return matches_info;
-  } catch {
+  } catch(error) {
+    console.log(error);
     throw {
       status: 400,
       message: "Something went wrong when trying to retrieve matches by query",
@@ -256,13 +257,18 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
   );
 
   // add each event log array to matches_info as additional property
+  let past_matches = [];
+  let future_matches = [];
   const match_info_with_event_log = matches_info.map((match) => {
     match.event_log = Object.values(event_logs_grouped_by_id).find(
       (event_log) => match.match_id === event_log[0].match_id
     );
-    return match;
+    match.event_log ?  past_matches.push(match) : future_matches.push(match);
   });
-  return match_info_with_event_log;
+  return {
+    past_matches,
+    future_matches
+  };
 }
 /**
  *
