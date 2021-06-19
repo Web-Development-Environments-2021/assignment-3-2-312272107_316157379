@@ -1,6 +1,7 @@
 const info_include_param = `team,stats,position`;
 const LEAGUE_ID = 271;
 const users_utils = require("./users_utils");
+// const DBUtils = require("./DButils");
 /**
  *
  *
@@ -79,7 +80,25 @@ async function get_info(players, caller) {
   return players_info;
 }
 
+async function get_players_info_for_team_page(team_with_players,user_id){
+
+  let favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
+  favorite_players_ids = new Set(favorite_players_ids);
+  const players_info = team_with_players.squad.data.map((player) =>{
+    let player_details = get_basic_info(player.player.data)
+    player_details.position = player.position_id;
+    player_details.in_favorites = favorite_players_ids.has(player_details.player_id);
+    return player_details;
+  }
+  );
+  return players_info;
+  
+}
+
+
+
 exports.info_include_param = info_include_param;
 exports.get_info = get_info;
 exports.filter_by_league = filter_by_league;
 exports.get_basic_info = get_basic_info;
+exports.get_players_info_for_team_page = get_players_info_for_team_page;

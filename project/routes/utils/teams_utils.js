@@ -50,7 +50,7 @@ function filter_by_league(teams, league_id) {
   return teams_in_league;
 }
 
-async function get_player_and_team_info(team_id, league_id = 271) {
+async function get_player_and_team_info(team_id,user_id, league_id = 271) {
   try {
     // let player_ids = [];
     let team_with_players = await axios.get(`${api_domain}/teams/${team_id}`, {
@@ -66,13 +66,13 @@ async function get_player_and_team_info(team_id, league_id = 271) {
       return "";
     }
     team_with_players = team_with_players[0];
-    const team_name = team_with_players.name;
-    const players_info = team_with_players.squad.data.map((player) =>
-      players_utils.get_basic_info(player.player.data)
-    );
+    const players_info = await players_utils.get_players_info_for_team_page(team_with_players,user_id);
 
     return {
-      team_name: team_name,
+      team_details : {
+        team_name: team_with_players.name,
+        team_logo: team_with_players.logo_path
+      },
       players: players_info,
     };
   } catch {

@@ -288,11 +288,16 @@ async function get_info(matches_ids, category) {
 function divide_to_past_and_future_matches(matches_in_stage){
   past_matches = []
   future_matches = []
-  matches_in_stage.map(match => match.event_log ?  past_matches.push(match) : future_matches.push(match)); 
+  if(!isObjectEmpty(matches_in_stage)){ // bandaid
+    matches_in_stage.map(match => match && match.event_log ?  past_matches.push(match) : future_matches.push(match)); 
+  }
   return {
     past_matches: past_matches,
     future_matches: future_matches
   }
+}
+function isObjectEmpty(obj) {
+  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 }
 
 exports.event_types = event_types;
