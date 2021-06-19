@@ -222,11 +222,14 @@ async function get_matches_by_query(matches_query) {
       "SELECT * FROM dbo.matches_event_log WHERE match_id IN (SELECT match_id FROM dbo.matches WHERE is_over=1) ORDER BY match_id,minute_in_game"
     );
     let matches_info = await DButils.execQuery(matches_query);
-    if (matches_info != 0 && event_log_info_query.length != 0) {
+    if (matches_info.length != 0 && event_log_info_query.length != 0) {
       matches_info = add_event_logs_to_past_matches(
         event_log_info_query,
         matches_info
       );
+    }
+    else{
+      matches_info = {}
     }
     return matches_info;
   } catch(error) {
@@ -257,18 +260,13 @@ function add_event_logs_to_past_matches(event_log_info_query, matches_info) {
   );
 
   // add each event log array to matches_info as additional property
-  let past_matches = [];
-  let future_matches = [];
   const match_info_with_event_log = matches_info.map((match) => {
     match.event_log = Object.values(event_logs_grouped_by_id).find(
       (event_log) => match.match_id === event_log[0].match_id
     );
-    match.event_log ?  past_matches.push(match) : future_matches.push(match);
+    return match;
   });
-  return {
-    past_matches,
-    future_matches
-  };
+  return match_info_with_event_log;
 }
 /**
  *
@@ -287,8 +285,18 @@ async function get_info(matches_ids, category) {
   return matches_info;
 }
 
+function divide_to_past_and_future_matches(matches_in_stage){
+  past_matches = []
+  future_matches = []
+  matches_in_stage.map(match => match.event_log ?  past_matches.push(match) : future_matches.push(match)); 
+  return {
+    past_matches: past_matches,
+    future_matches: future_matches
+  }
+}
+
 exports.event_types = event_types;
-// exports.add_event_logs_to_past_matches = add_event_logs_to_past_matches;
+exports.divide_to_past_and_future_matches = divide_to_past_and_future_matches;
 exports.get_matches_by_query = get_matches_by_query;
 exports.verify_active_match = verify_active_match;
 exports.insert_new_event = insert_new_event;

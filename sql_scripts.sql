@@ -111,7 +111,7 @@
 -- insert into users values('Afghanistan','$2a$13$YmIAQpyIRe4B7klU8NNMM.7/k/AS1f6xLQHnNhbWVTGfyc0rGFiPO','asd@asd.com','tobas','toasd','https://lol.com','tomas');
 -- select * from matches
 -- select * from dbo.users
-
-
-      INSERT INTO dbo.users(username, password,first_name,last_name,email,country,profile_pic) 
-      VALUES ('username','pass','first_name','last_name','email','country','profile_pic');
+-- ALTER TABLE matches ALTER COLUMN stage varchar(300);
+-- update matches set stage='Conference League Play-offs - Final' where stage='Conference League Play-offs-Final';
+-- select * from favorite_matches
+delete from favorite_matches

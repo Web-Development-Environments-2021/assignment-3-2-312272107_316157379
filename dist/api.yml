@@ -78,7 +78,7 @@ paths:
         "404":
           description: could not find league with league id {league_id}
         "400":
-          description: Something went wrong when trying to get stage by id
+            description: Something went wrong when trying to get stage by id OR league name should have letters only
   /league/{league_id}/matches:
     get:
       tags: 
@@ -120,7 +120,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/matches_full_details_with_event_log'
+                type: object
+                properties:
+                  past_matches:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/matches_full_details_with_event_log'
+                  future_matches: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/match_full_details'
         "400":
           description: Something went wrong when trying to retrieve matches
           
@@ -334,7 +343,7 @@ paths:
         '201':
           description: "The {category_name} was successfully saved as a favorite"
         "400":
-          description: "invalid category name"
+          description:  'already in favorites or bad input when trying to insert to favorites or invalid category name'
           
           
 components:
@@ -363,16 +372,12 @@ components:
         last_name:
           type: string
           example: 'Adapter'
-        country: #do we need to enforce this further?
+        country:
             type: string
             example: 'Kings Dominion'
         email:
           type: string
           format: email
-        profile_pic:
-          type: string
-          format: URL
-          example: 'https://www.some_domain.com/my_img.jpg'
     Login:
       type: object
       description: user info for login
@@ -459,17 +464,12 @@ components:
     matches_full_details_with_event_log:
       type: array
       items:
-        type: object
-        properties:
-          match_with_event_log:
-            allOf:
-            - $ref: '#/components/schemas/match_full_details'
-            - type: array
-              items:
-                allOf:
-                - type: integer
-                  description: match_id
-                - $ref: '#/components/schemas/new_game_event'
+        allOf:
+          - $ref: '#/components/schemas/match_full_details'
+          - type: array
+            items:
+              $ref: '#/components/schemas/new_game_event'
+                
     player_basic_details:
       type: object
       properties:

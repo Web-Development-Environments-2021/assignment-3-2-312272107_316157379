@@ -76,6 +76,7 @@ router.get("/favorites/:category_name", async (req, res, next) => {
     res.status(200).send(favorites_info);
     logStream.end("successfully returned favorites");
   } catch (error) {
+    console.log(error);
     logStream.end(error.message);
     next(error);
   }
