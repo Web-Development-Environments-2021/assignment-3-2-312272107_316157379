@@ -10,7 +10,8 @@ const users_utils = require("./users_utils");
 function get_basic_info(player) {
   return {
     id: player.player_id,
-    name: player.common_name,
+    full_name: player.fullname,
+    common_name: player.common_name,
     nationality: player.nationality,
     country: player.birthcountry,
     birth_date: player.birthdate,
