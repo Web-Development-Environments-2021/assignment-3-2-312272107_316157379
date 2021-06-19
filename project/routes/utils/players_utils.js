@@ -12,7 +12,7 @@ function get_basic_info(player) {
     id: player.player_id,
     full_name: player.fullname,
     common_name: player.common_name,
-    nationality: player.nationality,
+    birth_country: player.birthCountry,
     country: player.birthcountry,
     birth_date: player.birthdate,
     height: player.height,
