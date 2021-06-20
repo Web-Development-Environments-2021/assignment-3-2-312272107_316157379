@@ -103,7 +103,7 @@ async function get_team_in_league(team_name, league_id = LEAGUE_ID) {
       message: `could not match ${team_name} to a team in the given league`,
     };
   }
-  return team_in_league;
+  return team_in_league[0];
 }
 
 // ************************** fix catch
@@ -125,6 +125,5 @@ async function get_venue(venue_id) {
 exports.info_include_param = info_include_param;
 exports.get_venue = get_venue;
 exports.get_team_in_league = get_team_in_league;
-exports.get_info = extract_relevant_data;
 exports.get_player_and_team_info = get_player_and_team_info;
 exports.get_info = get_info;

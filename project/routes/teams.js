@@ -31,4 +31,15 @@ router.get("/get_page_details/:team_id", async (req, res, next) => {
   }
 });
 
+router.get("/:team_name", async (req, res, next) => {
+  try {
+    let team_info = await teams_utils.get_team_in_league(
+      req.params.team_name
+    );
+    res.status(200).send(team_info);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
