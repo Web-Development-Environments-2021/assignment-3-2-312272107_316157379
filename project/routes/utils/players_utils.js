@@ -9,6 +9,7 @@ const users_utils = require("./users_utils");
  * @return {Object} containing display information of player
  */
 function get_basic_info(player) {
+
   return {
     id: player.player_id,
     full_name: player.fullname,
@@ -19,6 +20,7 @@ function get_basic_info(player) {
     height: player.height,
     weight: player.weight,
     image: player.image_path,
+    player_position: player.position_id
   };
 }
 /**
@@ -30,7 +32,6 @@ function get_full_info(players) {
   const players_full_info = players.map((player) => {
     let player_info = get_basic_info(player);
     player_info.team_name = player.team.data.name;
-    player_info.player_position = player.position.data.name;
     return player_info;
   });
   return players_full_info;
@@ -82,12 +83,18 @@ async function get_info(players, caller) {
 
 async function get_players_info_for_team_page(team_with_players,user_id){
 
-  let favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
-  favorite_players_ids = new Set(favorite_players_ids);
-  const players_info = team_with_players.squad.data.map((player) =>{
+  let favorite_players_ids;
+  if(user_id){
+    favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
+    favorite_players_ids = new Set(favorite_players_ids);
+  }
+  else{
+    favorite_players_ids = new Set();
+  }
+  
+  let players_info = team_with_players.squad.data.map((player) =>{
     let player_details = get_basic_info(player.player.data)
-    player_details.position = player.position_id;
-    player_details.in_favorites = favorite_players_ids.has(player_details.player_id);
+    player_details.in_favorites = favorite_players_ids.has(player_details.id);
     return player_details;
   }
   );
@@ -95,8 +102,16 @@ async function get_players_info_for_team_page(team_with_players,user_id){
   
 }
 
+async function in_favorites(player_id, user_id){
+  if(!user_id){
+    return false;
+  }
+  let favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
+      favorite_players_ids = new Set(favorite_players_ids);
+      return favorite_players_ids.has(player_id);
+}
 
-
+exports.in_favorites = in_favorites;
 exports.info_include_param = info_include_param;
 exports.get_info = get_info;
 exports.filter_by_league = filter_by_league;

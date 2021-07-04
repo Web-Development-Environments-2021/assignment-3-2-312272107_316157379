@@ -157,23 +157,27 @@ paths:
         "400":
           description: Something went wrong when trying to retrieve matches OR Something went wrong when trying to retrieve team or players' details
           
-  # /teams/{team_name}/matches:
-  #   get:
-  #     tags: 
-  #       - teams
-  #     summary: get_matches_by_team_name
-  #     description: get all matches team has played in or will play in. 
-  #     parameters: 
-  #     - in: "path"
-  #       name: team_name
-  #       required: true
-  #       schema:
-  #         type: string
-  #     responses:
-  #       "200":
-  #         description: "returned matches that match team id"
-  #       "404":
-  #         description: "invalid team id, could not find matches"
+  /teams/{team_name}:
+    get:
+      tags: 
+        - teams
+      summary: get_team_by_name
+      description: get all team's details based on name
+      parameters: 
+      - in: "path"
+        name: team_name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "returned matches that match team id"
+          content:
+            application/json:
+              schema:
+                $ref:  '#/components/schemas/team_details'
+        "404":
+          description: "could not match {team_name} to a team in the given league"
   
   /users/union_rep/matches:
     post:
