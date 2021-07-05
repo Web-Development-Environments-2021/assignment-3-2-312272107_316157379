@@ -108,7 +108,7 @@ async function in_favorites(player_id, user_id){
   }
   let favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
       favorite_players_ids = new Set(favorite_players_ids);
-      return favorite_players_ids.has(player_id);
+      return favorite_players_ids.has(parseInt(player_id));
 }
 
 exports.in_favorites = in_favorites;

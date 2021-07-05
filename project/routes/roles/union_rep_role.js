@@ -82,4 +82,17 @@ router.post("/matches/:match_id/event_log", async (req, res, next) => {
   }
 });
 
+
+router.put("/:match_id/:goals", async (req, res, next) => {
+  try {
+    await matches_utils.update_match_score(
+      req.params.match_id,req.body.isHomeTeam,req.params.goals
+    );
+    
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

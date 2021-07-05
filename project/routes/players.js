@@ -8,10 +8,10 @@ router.get("/:player_id", async (req, res, next) => {
   try {
     let player_info = await players_utils.get_info([req.params.player_id]);
 
-    player_info.in_favorites = await players_utils.in_favorites(player_info.id,req.session.user_id);
+    player_info[0].in_favorites = await players_utils.in_favorites(req.params.player_id,req.session.user_id);
 
     res.status(200).send(player_info);
-  } catch (error) {
+  } catch (error) { 
     next({
       status: 404,
       message: "invalid player id",

@@ -300,6 +300,22 @@ function isObjectEmpty(obj) {
   return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 }
 
+async function update_match_score(match_id,IsHomeTeam,goals){
+  try{
+    let team_goals = IsHomeTeam ? 'home_team_goals' : 'away_team_goals';
+    await DButils.execQuery(`UPDATE matches SET
+    ${team_goals}=${goals}  
+    where match_id =${match_id} AND is_over=1 ` )
+  } catch (error) {
+    throw {
+      status: 400,
+      message: "Can't update match's score"
+    }
+  }
+}
+
+
+exports.update_match_score = update_match_score;
 exports.event_types = event_types;
 exports.divide_to_past_and_future_matches = divide_to_past_and_future_matches;
 exports.get_matches_by_query = get_matches_by_query;
