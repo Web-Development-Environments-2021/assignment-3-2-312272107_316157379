@@ -66,7 +66,7 @@ async function get_player_and_team_info(team_id,user_id, league_id = 271) {
       return "";
     }
     team_with_players = team_with_players[0];
-    const players_info = await players_utils.get_players_info_for_team_page(team_with_players,user_id);
+    const players_info = await players_utils.get_players_info_for_team_page(team_with_players.squad.data,user_id);
 
     return {
       team_details : {

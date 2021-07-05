@@ -81,7 +81,7 @@ async function get_info(players, caller) {
   return players_info;
 }
 
-async function get_players_info_for_team_page(team_with_players,user_id){
+async function get_players_info_for_team_page(players,user_id){
 
   let favorite_players_ids;
   if(user_id){
@@ -92,7 +92,7 @@ async function get_players_info_for_team_page(team_with_players,user_id){
     favorite_players_ids = new Set();
   }
   
-  let players_info = team_with_players.squad.data.map((player) =>{
+  let players_info = players.map((player) =>{
     let player_details = get_basic_info(player.player.data)
     player_details.in_favorites = favorite_players_ids.has(player_details.id);
     return player_details;
