@@ -26,7 +26,8 @@ router.get("/:category_name/:name_query", async (req, res, next) => {
 
     const search_results_info = await utils_by_category.get_info(
       search_results,
-      "search"
+      "search",
+      req.session.user_id
     );
 
     res.status(200).send(search_results_info);

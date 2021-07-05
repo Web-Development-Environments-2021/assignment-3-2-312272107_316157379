@@ -9,7 +9,6 @@ const users_utils = require("./users_utils");
  * @return {Object} containing display information of player
  */
 function get_basic_info(player) {
-
   return {
     id: player.player_id,
     full_name: player.fullname,
@@ -20,21 +19,8 @@ function get_basic_info(player) {
     height: player.height,
     weight: player.weight,
     image: player.image_path,
-    player_position: player.position_id
+    player_position: player.position_id,
   };
-}
-/**
- * display information of player, plus team name and player's position.
- * @param {*} players
- * @return {*}
- */
-function get_full_info(players) {
-  const players_full_info = players.map((player) => {
-    let player_info = get_basic_info(player);
-    player_info.team_name = player.team.data.name;
-    return player_info;
-  });
-  return players_full_info;
 }
 /**
  * filters players based on league
@@ -66,7 +52,7 @@ function filter_by_league(players, league_id = LEAGUE_ID) {
  * @param {*} caller: function that has called this function. different callers have different inputs for the function and therefore require different handling.
  * @return {*}
  */
-async function get_info(players, caller) {
+async function get_info(players, caller, user_id) {
   let players_as_objects;
   if (caller != "search") {
     //favorites, get_player_by_id
@@ -77,38 +63,47 @@ async function get_info(players, caller) {
     players_as_objects = players.data.data;
   }
   const players_in_league = filter_by_league(players_as_objects, LEAGUE_ID);
-  const players_info = get_full_info(players_in_league);
+  const players_info = get_full_info(players_in_league, user_id);
   return players_info;
 }
 
-async function get_players_info_for_team_page(players,user_id){
-
+async function get_full_info(players, user_id) {
   let favorite_players_ids;
-  if(user_id){
-    favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
+  if (user_id) {
+    favorite_players_ids = await users_utils.get_favorites_ids(
+      "player",
+      user_id
+    );
     favorite_players_ids = new Set(favorite_players_ids);
-  }
-  else{
+  } else {
     favorite_players_ids = new Set();
   }
-  
-  let players_info = players.map((player) =>{
-    let player_details = get_basic_info(player.player.data)
+
+  let players_info = players.map((player) => {
+    let player_details;
+    if(player.player){
+      player_details = player.player.data;
+    }
+    player_details = get_basic_info(player);
+    if (player.team) {
+      player.team_name = player.team.data.name;
+    }
     player_details.in_favorites = favorite_players_ids.has(player_details.id);
     return player_details;
-  }
-  );
+  });
   return players_info;
-  
 }
 
-async function in_favorites(player_id, user_id){
-  if(!user_id){
+async function in_favorites(player_id, user_id) {
+  if (!user_id) {
     return false;
   }
-  let favorite_players_ids  = await users_utils.get_favorites_ids('player',user_id);
-      favorite_players_ids = new Set(favorite_players_ids);
-      return favorite_players_ids.has(parseInt(player_id));
+  let favorite_players_ids = await users_utils.get_favorites_ids(
+    "player",
+    user_id
+  );
+  favorite_players_ids = new Set(favorite_players_ids);
+  return favorite_players_ids.has(parseInt(player_id));
 }
 
 exports.in_favorites = in_favorites;
@@ -116,4 +111,3 @@ exports.info_include_param = info_include_param;
 exports.get_info = get_info;
 exports.filter_by_league = filter_by_league;
 exports.get_basic_info = get_basic_info;
-exports.get_players_info_for_team_page = get_players_info_for_team_page;

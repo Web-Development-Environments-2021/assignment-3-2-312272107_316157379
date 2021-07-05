@@ -281,6 +281,7 @@ async function get_info(matches_ids, category) {
     const matches_ids_as_string = matches_ids.join();
     const matches_in_league_and_not_over = `SELECT * FROM dbo.matches WHERE match_id IN (${matches_ids_as_string}) AND is_over=0`;
     matches_info = await get_matches_by_query(matches_in_league_and_not_over);
+    matches_info = divide_to_past_and_future_matches(matches_info); //
   }
   return matches_info;
 }
