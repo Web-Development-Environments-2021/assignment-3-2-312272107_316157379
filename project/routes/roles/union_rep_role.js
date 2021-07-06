@@ -39,8 +39,8 @@ router.post("/matches", async (req, res, next) => {
       away_team_name,
       date_time
     );
-
-    const venue = await teams_utils.get_venue(home_team[0].venue_id);
+    let venueID =home_team.venue_id;
+    const venue = await teams_utils.get_venue(venueID);
 
     const match_id = await matches_utils.insert_new_match(
       date_time,
