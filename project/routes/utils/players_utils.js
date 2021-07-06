@@ -80,13 +80,13 @@ async function get_full_info(players, user_id) {
   }
 
   let players_info = players.map((player) => {
-    let player_details;
+    let player_details = player;
     if(player.player){
       player_details = player.player.data;
     }
-    player_details = get_basic_info(player);
+    player_details = get_basic_info(player_details);
     if (player.team) {
-      player.team_name = player.team.data.name;
+      player_details.team_name = player.team.data.name;
     }
     player_details.in_favorites = favorite_players_ids.has(player_details.id);
     return player_details;
@@ -111,3 +111,4 @@ exports.info_include_param = info_include_param;
 exports.get_info = get_info;
 exports.filter_by_league = filter_by_league;
 exports.get_basic_info = get_basic_info;
+exports.get_full_info = get_full_info;
