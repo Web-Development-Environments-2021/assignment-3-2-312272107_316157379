@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  description: Assignment 3.1 API
-  version: "1.0.0"
-  title: Assignment 3.1 API
+  version: '1'
+  title: Assignment3-3
+  description: Svivot final assignment
   contact:
     email: avichaie@post.bgu.ac.il 
 paths:
@@ -78,7 +78,7 @@ paths:
         "404":
           description: could not find league with league id {league_id}
         "400":
-            description: Something went wrong when trying to get stage by id OR league name should have letters only
+          description: Something went wrong when trying to get stage by id
   /league/{league_id}/matches:
     get:
       tags: 
@@ -101,7 +101,7 @@ paths:
                 $ref: '#/components/schemas/matches_full_details_with_event_log'
         "400":
           description: Something went wrong when trying to search for matches
-  /matches/{stage_name}:
+  /matches/{stage_id}:
     get:
       tags: 
         - matches
@@ -109,10 +109,10 @@ paths:
       description: games in current stage page 
       parameters: 
       - in: "path"
-        name: stage_name
+        name: stage_id
         required: true
         schema:
-          type: string
+          type: integer
           example: 0
       responses:
         "200":
@@ -120,16 +120,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  past_matches:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/matches_full_details_with_event_log'
-                  future_matches: 
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/match_full_details'
+                $ref: '#/components/schemas/matches_full_details_with_event_log'
         "400":
           description: Something went wrong when trying to retrieve matches
           
@@ -157,27 +148,23 @@ paths:
         "400":
           description: Something went wrong when trying to retrieve matches OR Something went wrong when trying to retrieve team or players' details
           
-  /teams/{team_name}:
-    get:
-      tags: 
-        - teams
-      summary: get_team_by_name
-      description: get all team's details based on name
-      parameters: 
-      - in: "path"
-        name: team_name
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: "returned matches that match team id"
-          content:
-            application/json:
-              schema:
-                $ref:  '#/components/schemas/team_details'
-        "404":
-          description: "could not match {team_name} to a team in the given league"
+  # /teams/{team_name}/matches:
+  #   get:
+  #     tags: 
+  #       - teams
+  #     summary: get_matches_by_team_name
+  #     description: get all matches team has played in or will play in. 
+  #     parameters: 
+  #     - in: "path"
+  #       name: team_name
+  #       required: true
+  #       schema:
+  #         type: string
+  #     responses:
+  #       "200":
+  #         description: "returned matches that match team id"
+  #       "404":
+  #         description: "invalid team id, could not find matches"
   
   /users/union_rep/matches:
     post:
@@ -197,8 +184,7 @@ paths:
         '400':
           description: "can't add match due to unmatching depenedencies or bad input"
         '404':
-          description: 
-            "couldn't find venue for match OR could not match ${team_name} to a team in the given league"
+          description: "couldn't find venue for match"
         
           
           
@@ -211,16 +197,10 @@ paths:
       description: add new event to event log of match_id
       parameters:
       - name: match_id
-        in: path 
+        in: "path" 
         required: true
         schema:
-           type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/new_game_event'
+           $ref: '#/components/schemas/new_game_event'
       responses:
         '201':
           description: "event of type ${event_type_name} was added successfully"
@@ -247,8 +227,6 @@ paths:
                 $ref: '#/components/schemas/player_full_details'
         "404":
           description: "invalid player id"
-        "400":
-          description: 'something went wrong when trying to query external API'
 
   /search/{category_name}/{name_query}:
     get:
@@ -313,7 +291,7 @@ paths:
                   oneOf:
                     - $ref: '#/components/schemas/player_full_details'
                     - $ref: '#/components/schemas/team_details'
-                    - $ref: '#/components/schemas/match_full_details' #without event logs because future matches
+                    - $ref: '#/components/schemas/match_in_db_details'
         "400":
           description: "invalid category name"
     post:
@@ -347,7 +325,7 @@ paths:
         '201':
           description: "The {category_name} was successfully saved as a favorite"
         "400":
-          description:  'already in favorites or bad input when trying to insert to favorites or invalid category name'
+          description: "invalid category name"
           
           
 components:
@@ -376,12 +354,16 @@ components:
         last_name:
           type: string
           example: 'Adapter'
-        country:
+        country: #do we need to enforce this further?
             type: string
             example: 'Kings Dominion'
         email:
           type: string
           format: email
+        profile_pic:
+          type: string
+          format: URL
+          example: 'https://www.some_domain.com/my_img.jpg'
     Login:
       type: object
       description: user info for login
@@ -419,8 +401,8 @@ components:
           example: 35
         event_type:
           type: string
-          description: possible events - Home-Goal,Away-Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution,End-Match any other event will be labeled as "Other".
-          example: 'Red-Card'
+          description: possible events - Goal,Offside,Foul,Red-Card,Yellow-Card,Injury,Substitution. any other event will be labeled as "Other".
+          example: 'Other'
         event_description:
           type: string
           example:  red card was given to messi for not being organized
@@ -437,10 +419,24 @@ components:
           type: string
           example:  Conference League Play-offs - Final
         next_match_details:
-          $ref: '#/components/schemas/match_full_details'
+          $ref: '#/components/schemas/match_in_db_details'
     match_in_db_details:
       type: object
       properties:
+        date_time:
+          type: string
+          format: date-time
+          description: 'yyyy-mm-dd hh:mm:ss'
+          example: '2012-12-22 03:59:12'
+        home_team_name:
+          type: string
+          example: 'OB'
+        away_team_name:
+          type: string
+          example: 'AGF'
+        stage:
+          type: string
+          example: 'Knock Out'  
         match_id:
           type: integer
           example: 7
@@ -461,19 +457,20 @@ components:
           type: boolean
           description: 0 if match is not over, 1 otherwise.
           example: 0
-    match_full_details:
-      allOf:
-        - $ref: '#/components/schemas/new_match'
-        - $ref: '#/components/schemas/match_in_db_details'
     matches_full_details_with_event_log:
       type: array
       items:
-        allOf:
-          - $ref: '#/components/schemas/match_full_details'
-          - type: array
-            items:
-              $ref: '#/components/schemas/new_game_event'
-                
+        type: object
+        properties:
+          match_with_event_log:
+            allOf:
+            - $ref: '#/components/schemas/match_in_db_details'
+            - type: array
+              items:
+                allOf:
+                - type: integer
+                  description: match_id
+                - $ref: '#/components/schemas/new_game_event'
     player_basic_details:
       type: object
       properties:
@@ -509,6 +506,8 @@ components:
         description: team_name
       - type: string
         description: position
+      - type: boolean
+        description: in_favorites
     team_details:
       type: object
       properties:
@@ -529,6 +528,8 @@ components:
     team_page_details:
       type: object
       properties:
+        team_details: 
+          $ref: '#/components/schemas/team_details'
         players_details:  
           type: array
           items:
